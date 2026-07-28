@@ -51,12 +51,12 @@ const tools: NavItem[] = [
 
 function SectionHeader({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
-    <div className="flex items-center justify-between px-3 py-1.5">
+    <div className="flex items-center justify-between px-3 py-2">
       <div className="flex items-center gap-2">
-        <Icon className="h-3.5 w-3.5 text-primary" />
-        <span className="text-xs font-semibold uppercase tracking-wide text-foreground">{label}</span>
+        <Icon className="h-4 w-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">{label}</span>
       </div>
-      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+      <ChevronDown className="h-4 w-4 text-muted-foreground" />
     </div>
   )
 }
@@ -66,7 +66,7 @@ function NavRow({ item }: { item: NavItem }) {
   return (
     <button
       className={cn(
-        "flex w-full items-center gap-2 rounded-sm px-3 py-1.5 text-[13px] transition-colors",
+        "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
         item.active
           ? "bg-accent/10 font-medium text-accent-foreground"
           : "text-muted-foreground hover:bg-secondary hover:text-foreground",
@@ -75,14 +75,14 @@ function NavRow({ item }: { item: NavItem }) {
       {item.step ? (
         <span
           className={cn(
-            "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-[10px] font-semibold",
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
             item.active ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground",
           )}
         >
           {item.step}
         </span>
       ) : null}
-      <Icon className={cn("h-3.5 w-3.5 shrink-0", item.active && "text-accent")} />
+      <Icon className={cn("h-4 w-4 shrink-0", item.active && "text-accent")} />
       <span className="truncate text-left">{item.label}</span>
     </button>
   )
@@ -90,16 +90,16 @@ function NavRow({ item }: { item: NavItem }) {
 
 export function AppSidebar() {
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-card">
-      <div className="border-b border-border p-2">
+    <aside className="flex w-72 shrink-0 flex-col border-r border-border bg-card">
+      <div className="border-b border-border p-3">
         <input
           type="search"
           placeholder="Search endpoint..."
-          className="w-full rounded-sm border border-input bg-background px-2.5 py-1.5 text-[13px] outline-none focus:ring-2 focus:ring-ring/40"
+          className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
         />
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-2">
+      <nav className="flex-1 overflow-y-auto px-2 py-3">
         <SectionHeader icon={Workflow} label="Project Pipeline" />
         <div className="flex flex-col gap-0.5">
           {pipeline.map((item) => (
@@ -107,17 +107,15 @@ export function AppSidebar() {
           ))}
         </div>
 
-        <div className="mt-3">
-          <div className="flex items-center gap-2 px-3 py-1.5">
-            <LifeBuoy className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs font-semibold uppercase tracking-wide text-foreground">
-              Support &amp; Troubleshoot
-            </span>
-            <ChevronDown className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
+        <div className="mt-4">
+          <div className="flex items-center gap-2 px-3 py-2">
+            <LifeBuoy className="h-4 w-4 text-primary" />
+            <span className="text-sm font-semibold text-foreground">Support &amp; Troubleshoot</span>
+            <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
           </div>
         </div>
 
-        <div className="mt-1">
+        <div className="mt-2">
           <SectionHeader icon={Wrench} label="Tools" />
           <div className="flex flex-col gap-0.5">
             {tools.map((item) => (
@@ -126,16 +124,16 @@ export function AppSidebar() {
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-2 rounded-sm px-3 py-1.5 text-[13px] text-muted-foreground">
-          <Server className="h-3.5 w-3.5 text-primary" />
+        <div className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground">
+          <Server className="h-4 w-4 text-primary" />
           <span className="font-medium text-foreground">API Endpoints</span>
-          <span className="ml-auto rounded-sm bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
+          <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
             142
           </span>
         </div>
       </nav>
 
-      <div className="border-t border-border px-3 py-1.5 font-mono text-[11px] text-muted-foreground">
+      <div className="border-t border-border px-4 py-2 text-xs text-muted-foreground">
         GET List Authorities · 200
       </div>
     </aside>
