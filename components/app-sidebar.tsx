@@ -68,21 +68,16 @@ function NavRow({ item }: { item: NavItem }) {
       className={cn(
         "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
         item.active
-          ? "bg-accent/10 font-medium text-accent-foreground"
+          ? "bg-primary/10 font-medium text-primary"
           : "text-muted-foreground hover:bg-secondary hover:text-foreground",
       )}
     >
       {item.step ? (
-        <span
-          className={cn(
-            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
-            item.active ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground",
-          )}
-        >
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
           {item.step}
         </span>
       ) : null}
-      <Icon className={cn("h-4 w-4 shrink-0", item.active && "text-accent")} />
+      <Icon className={cn("h-4 w-4 shrink-0", item.active && "text-primary")} />
       <span className="truncate text-left">{item.label}</span>
     </button>
   )
