@@ -1,48 +1,49 @@
 "use client"
 
-import { Menu, Settings, Zap, FlaskConical, ClipboardCheck, Check } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Menu, Zap, Check } from "lucide-react"
+import { pipelineNav } from "@/lib/nav-config"
 import { cn } from "@/lib/utils"
 
-interface Stage {
+type StageState = "done" | "active" | "todo"
+
+const steps = pipelineNav
+  .filter((item) => item.step != null)
+  .sort((a, b) => a.step! - b.step!)
+
+function StageNode({
+  label,
+  icon: Icon,
+  state,
+}: {
   label: string
   icon: React.ElementType
-  state: "done" | "active" | "todo"
-}
-
-const stages: Stage[] = [
-  { label: "Config", icon: Settings, state: "done" },
-  { label: "Ingestion", icon: ClipboardCheck, state: "done" },
-  { label: "Automation", icon: Zap, state: "done" },
-  { label: "Testing", icon: FlaskConical, state: "active" },
-]
-
-function StageNode({ stage }: { stage: Stage }) {
-  const Icon = stage.icon
+  state: StageState
+}) {
   return (
     <div className="flex items-center gap-2">
       <div
         className={cn(
           "flex h-7 w-7 items-center justify-center rounded-full border-2",
-          stage.state === "done" && "border-success bg-success text-success-foreground",
-          stage.state === "active" && "border-accent bg-accent/10 text-accent",
-          stage.state === "todo" && "border-border bg-background text-muted-foreground",
+          state === "done" && "border-success bg-success text-success-foreground",
+          state === "active" && "border-accent bg-accent/10 text-accent",
+          state === "todo" && "border-border bg-background text-muted-foreground",
         )}
       >
-        {stage.state === "done" ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+        {state === "done" ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
       </div>
-      <span
-        className={cn(
-          "text-xs font-medium",
-          stage.state === "active" ? "text-accent" : "text-muted-foreground",
-        )}
-      >
-        {stage.label}
+      <span className={cn("text-xs font-medium", state === "active" ? "text-accent" : "text-muted-foreground")}>
+        {label}
       </span>
     </div>
   )
 }
 
 export function AppHeader() {
+  const pathname = usePathname()
+  const matchedIndex = steps.findIndex((step) => step.href === pathname)
+  const activeIndex = matchedIndex === -1 ? steps.length - 1 : matchedIndex
+
   return (
     <header className="flex items-center gap-4 border-b border-border bg-card px-4 py-3">
       <button className="rounded-lg p-2 text-muted-foreground hover:bg-secondary" aria-label="Toggle menu">
@@ -59,16 +60,17 @@ export function AppHeader() {
       </div>
 
       <div className="mx-auto flex items-center gap-3">
-        {stages.map((stage, i) => (
-          <div key={stage.label} className="flex items-center gap-3">
-            <StageNode stage={stage} />
-            {i < stages.length - 1 && (
-              <div
-                className={cn("h-0.5 w-8 rounded-full", stage.state === "done" ? "bg-success" : "bg-border")}
-              />
-            )}
-          </div>
-        ))}
+        {steps.map((step, i) => {
+          const state: StageState = i < activeIndex ? "done" : i === activeIndex ? "active" : "todo"
+          return (
+            <div key={step.label} className="flex items-center gap-3">
+              <StageNode label={step.shortLabel ?? step.label} icon={step.icon} state={state} />
+              {i < steps.length - 1 && (
+                <div className={cn("h-0.5 w-8 rounded-full", state === "done" ? "bg-success" : "bg-border")} />
+              )}
+            </div>
+          )
+        })}
       </div>
 
       <div className="flex items-center gap-2.5">
