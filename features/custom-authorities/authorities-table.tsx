@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ChevronDown, Trash2, X, Play } from "lucide-react"
-import { authorities, type Authority } from "@/lib/authorities-data"
+import { authorities, type Authority } from "./authorities-data"
 import { cn } from "@/lib/utils"
 
 function StatusBadge({ status }: { status: Authority["status"] }) {

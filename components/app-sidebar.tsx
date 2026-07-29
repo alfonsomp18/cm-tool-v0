@@ -1,53 +1,10 @@
 "use client"
 
-import {
-  Workflow,
-  ListChecks,
-  Database,
-  Settings2,
-  Code2,
-  ShieldCheck,
-  FlaskConical,
-  LifeBuoy,
-  Wrench,
-  Plug,
-  Sparkles,
-  ArrowLeftRight,
-  Snowflake,
-  History,
-  FileText,
-  Compass,
-  ChevronDown,
-  Server,
-} from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Workflow, LifeBuoy, Wrench, ChevronDown, Server } from "lucide-react"
+import { pipelineNav, toolsNav, type NavItem } from "@/lib/nav-config"
 import { cn } from "@/lib/utils"
-
-interface NavItem {
-  label: string
-  icon: React.ElementType
-  badge?: string
-  active?: boolean
-  step?: number
-}
-
-const pipeline: NavItem[] = [
-  { label: "Configuration Projects", icon: ListChecks, step: 1 },
-  { label: "Data Ingestion", icon: Database, step: 2 },
-  { label: "Automated Configurations", icon: Settings2, step: 3 },
-  { label: "Automated ERP Code Mapping", icon: Code2 },
-  { label: "Custom Authorities", icon: ShieldCheck, active: true },
-  { label: "Automated Testing", icon: FlaskConical, step: 4 },
-]
-
-const tools: NavItem[] = [
-  { label: "API Connection", icon: Plug },
-  { label: "OpenArena AI", icon: Sparkles },
-  { label: "REST/SOAP Mapping", icon: ArrowLeftRight },
-  { label: "Snowflake", icon: Snowflake },
-  { label: "Request History", icon: History },
-  { label: "Documentation", icon: FileText },
-  { label: "Welcome / Tour", icon: Compass },
-]
 
 function SectionHeader({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
@@ -61,29 +18,40 @@ function SectionHeader({ icon: Icon, label }: { icon: React.ElementType; label: 
   )
 }
 
-function NavRow({ item }: { item: NavItem }) {
+function NavRow({ item, active }: { item: NavItem; active: boolean }) {
   const Icon = item.icon
-  return (
-    <button
-      className={cn(
-        "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-        item.active
-          ? "bg-primary/10 font-medium text-primary"
-          : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-      )}
-    >
+  const className = cn(
+    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
+    active
+      ? "bg-primary/10 font-medium text-primary"
+      : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+  )
+  const content = (
+    <>
       {item.step ? (
         <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
           {item.step}
         </span>
       ) : null}
-      <Icon className={cn("h-4 w-4 shrink-0", item.active && "text-primary")} />
+      <Icon className={cn("h-4 w-4 shrink-0", active && "text-primary")} />
       <span className="truncate text-left">{item.label}</span>
-    </button>
+    </>
   )
+
+  if (item.href) {
+    return (
+      <Link href={item.href} className={className}>
+        {content}
+      </Link>
+    )
+  }
+
+  return <button className={className}>{content}</button>
 }
 
 export function AppSidebar() {
+  const pathname = usePathname()
+
   return (
     <aside className="flex w-72 shrink-0 flex-col border-r border-border bg-card">
       <div className="border-b border-border p-3">
@@ -97,8 +65,8 @@ export function AppSidebar() {
       <nav className="flex-1 overflow-y-auto px-2 py-3">
         <SectionHeader icon={Workflow} label="Project Pipeline" />
         <div className="flex flex-col gap-0.5">
-          {pipeline.map((item) => (
-            <NavRow key={item.label} item={item} />
+          {pipelineNav.map((item) => (
+            <NavRow key={item.label} item={item} active={item.href === pathname} />
           ))}
         </div>
 
@@ -113,8 +81,8 @@ export function AppSidebar() {
         <div className="mt-2">
           <SectionHeader icon={Wrench} label="Tools" />
           <div className="flex flex-col gap-0.5">
-            {tools.map((item) => (
-              <NavRow key={item.label} item={item} />
+            {toolsNav.map((item) => (
+              <NavRow key={item.label} item={item} active={item.href === pathname} />
             ))}
           </div>
         </div>
