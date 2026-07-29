@@ -11,7 +11,7 @@ function StatusBadge({ status }: { status: Authority["status"] }) {
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium",
         status === "pending" && "bg-accent/15 text-accent",
-        status === "success" && "bg-primary/15 text-primary",
+        status === "success" && "bg-success/15 text-success",
         status === "error" && "bg-destructive/15 text-destructive",
       )}
     >

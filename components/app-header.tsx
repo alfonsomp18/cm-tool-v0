@@ -23,7 +23,7 @@ function StageNode({ stage }: { stage: Stage }) {
       <div
         className={cn(
           "flex h-7 w-7 items-center justify-center rounded-full border-2",
-          stage.state === "done" && "border-primary bg-primary text-primary-foreground",
+          stage.state === "done" && "border-success bg-success text-success-foreground",
           stage.state === "active" && "border-accent bg-accent/10 text-accent",
           stage.state === "todo" && "border-border bg-background text-muted-foreground",
         )}
@@ -64,7 +64,7 @@ export function AppHeader() {
             <StageNode stage={stage} />
             {i < stages.length - 1 && (
               <div
-                className={cn("h-0.5 w-8 rounded-full", stage.state === "done" ? "bg-primary" : "bg-border")}
+                className={cn("h-0.5 w-8 rounded-full", stage.state === "done" ? "bg-success" : "bg-border")}
               />
             )}
           </div>
@@ -79,7 +79,7 @@ export function AppHeader() {
           UAT - AWS AMER | Embraport
         </span>
         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="h-2 w-2 rounded-full bg-primary" />
+          <span className="h-2 w-2 rounded-full bg-success" />
           Connected (29m)
         </span>
         <div className="flex overflow-hidden rounded-lg border border-border text-xs font-semibold">
