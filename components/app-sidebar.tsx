@@ -10,7 +10,7 @@ function SectionHeader({ icon: Icon, label }: { icon: React.ElementType; label: 
   return (
     <div className="flex items-center justify-between px-3 py-2">
       <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4 text-primary" />
+        <Icon className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm font-semibold text-foreground">{label}</span>
       </div>
       <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -29,7 +29,7 @@ function NavRow({ item, active }: { item: NavItem; active: boolean }) {
   const content = (
     <>
       {item.step ? (
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground text-[11px] font-semibold text-background">
           {item.step}
         </span>
       ) : null}
@@ -72,7 +72,7 @@ export function AppSidebar() {
 
         <div className="mt-4">
           <div className="flex items-center gap-2 px-3 py-2">
-            <LifeBuoy className="h-4 w-4 text-primary" />
+            <LifeBuoy className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-semibold text-foreground">Support &amp; Troubleshoot</span>
             <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
           </div>
@@ -88,9 +88,9 @@ export function AppSidebar() {
         </div>
 
         <div className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground">
-          <Server className="h-4 w-4 text-primary" />
+          <Server className="h-4 w-4 text-muted-foreground" />
           <span className="font-medium text-foreground">API Endpoints</span>
-          <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
+          <span className="ml-auto rounded-full bg-foreground px-2 py-0.5 text-[11px] font-semibold text-background">
             142
           </span>
         </div>

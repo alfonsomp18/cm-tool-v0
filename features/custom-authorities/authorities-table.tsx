@@ -24,7 +24,7 @@ function CountPill({ value }: { value: number }) {
   return (
     <button className="inline-flex items-center gap-1 rounded-lg border border-input bg-background px-2 py-1 text-xs hover:bg-secondary">
       <ChevronDown className="h-3 w-3 text-muted-foreground" />
-      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-semibold text-background">
         {value}
       </span>
     </button>
@@ -60,7 +60,7 @@ export function AuthoritiesTable() {
         <select className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none">
           <option>All Types</option>
         </select>
-        <button className="rounded-lg border border-input bg-primary p-2 text-primary-foreground">
+        <button className="rounded-lg border border-input bg-card p-2 text-muted-foreground hover:bg-secondary">
           <ChevronDown className="h-4 w-4" />
         </button>
         <select className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none">
@@ -89,7 +89,7 @@ export function AuthoritiesTable() {
                   onChange={() =>
                     setSelected(allSelected ? new Set() : new Set(authorities.map((a) => a.id)))
                   }
-                  className="h-4 w-4 accent-primary"
+                  className="h-4 w-4 accent-foreground"
                 />
               </th>
               <th className="px-3 py-3">Authority Name</th>
@@ -117,7 +117,7 @@ export function AuthoritiesTable() {
                     type="checkbox"
                     checked={selected.has(a.id)}
                     onChange={() => toggle(a.id)}
-                    className="h-4 w-4 accent-primary"
+                    className="h-4 w-4 accent-foreground"
                   />
                 </td>
                 <td className="px-3 py-2">
