@@ -26,13 +26,13 @@ function StageNode({
         className={cn(
           "flex h-7 w-7 items-center justify-center rounded-full border-2",
           state === "done" && "border-success bg-success text-success-foreground",
-          state === "active" && "border-accent bg-accent/10 text-accent",
+          state === "active" && "border-primary bg-primary/10 text-primary",
           state === "todo" && "border-border bg-background text-muted-foreground",
         )}
       >
         {state === "done" ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
       </div>
-      <span className={cn("text-xs font-medium", state === "active" ? "text-accent" : "text-muted-foreground")}>
+      <span className={cn("text-xs font-medium", state === "active" ? "text-primary" : "text-muted-foreground")}>
         {label}
       </span>
     </div>
@@ -77,7 +77,7 @@ export function AppHeader() {
         <select className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm outline-none">
           <option>Embraport UAT</option>
         </select>
-        <span className="rounded-full bg-accent/15 px-3 py-1.5 text-xs font-semibold text-accent">
+        <span className="rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground">
           UAT - AWS AMER | Embraport
         </span>
         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -86,7 +86,7 @@ export function AppHeader() {
         </span>
         <div className="flex overflow-hidden rounded-lg border border-border text-xs font-semibold">
           <button className="bg-background px-2.5 py-1.5 text-muted-foreground">PT</button>
-          <button className="bg-primary px-2.5 py-1.5 text-primary-foreground">EN</button>
+          <button className="bg-foreground px-2.5 py-1.5 text-background">EN</button>
         </div>
       </div>
     </header>

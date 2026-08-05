@@ -49,27 +49,36 @@ export function AuthoritiesTable() {
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 px-6 py-4">
-        <input
-          type="search"
-          placeholder="Search by name, type, ERP code..."
-          className="min-w-64 flex-1 rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
-        />
-        <select className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none">
-          <option>All Actions</option>
-        </select>
-        <select className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none">
-          <option>All Types</option>
-        </select>
-        <button className="rounded-lg border border-input bg-card p-2 text-muted-foreground hover:bg-secondary">
-          <ChevronDown className="h-4 w-4" />
-        </button>
-        <select className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none">
-          <option>Bulk action</option>
-        </select>
-        <button className="flex items-center gap-1.5 rounded-lg border border-destructive px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10">
-          <Trash2 className="h-4 w-4" />
-          Delete Selected
-        </button>
+        <div className="flex flex-1 flex-wrap items-center gap-2">
+          <input
+            type="search"
+            placeholder="Search by name, type, ERP code..."
+            className="min-w-64 flex-1 rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+          />
+          <select className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus:border-input">
+            <option>All Actions</option>
+          </select>
+          <select className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus:border-input">
+            <option>All Types</option>
+          </select>
+          <button
+            aria-label="More filters"
+            title="More filters"
+            className="rounded-lg border border-transparent p-2 text-muted-foreground hover:border-input hover:bg-secondary hover:text-foreground"
+          >
+            <ChevronDown className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 border-l border-border pl-3">
+          <select className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none">
+            <option>Bulk action</option>
+          </select>
+          <button className="flex items-center gap-1.5 rounded-lg border border-destructive px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10">
+            <Trash2 className="h-4 w-4" />
+            Delete Selected
+          </button>
+        </div>
       </div>
 
       {/* Generated banner */}
