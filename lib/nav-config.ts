@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react"
 import {
+  Home,
   ListChecks,
   Database,
   Settings2,
@@ -24,14 +25,30 @@ export interface NavItem {
   icon: LucideIcon
   /** Presence marks this item as part of the header's numbered stage tracker. */
   step?: number
+  /** One-line blurb shown on the home screen's tile. Only set for built pages. */
+  description?: string
 }
+
+export const homeNav: NavItem = { label: "Home", href: "/", icon: Home }
 
 export const pipelineNav: NavItem[] = [
   { label: "Configuration Projects", shortLabel: "Config", icon: ListChecks, step: 1 },
-  { label: "Data Ingestion", shortLabel: "Ingestion", href: "/data-ingestion", icon: Database, step: 2 },
+  {
+    label: "Data Ingestion",
+    shortLabel: "Ingestion",
+    href: "/data-ingestion",
+    icon: Database,
+    step: 2,
+    description: "Pull in source data before it's mapped and configured.",
+  },
   { label: "Automated Configurations", shortLabel: "Automation", icon: Settings2, step: 3 },
   { label: "Automated ERP Code Mapping", icon: Code2 },
-  { label: "Custom Authorities", href: "/custom-authorities", icon: ShieldCheck },
+  {
+    label: "Custom Authorities",
+    href: "/custom-authorities",
+    icon: ShieldCheck,
+    description: "Review and edit generated tax authorities before execution.",
+  },
   { label: "Automated Testing", shortLabel: "Testing", icon: FlaskConical, step: 4 },
 ]
 

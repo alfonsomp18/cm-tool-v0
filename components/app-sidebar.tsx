@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Workflow, LifeBuoy, Wrench, ChevronDown, Server } from "lucide-react"
-import { pipelineNav, toolsNav, type NavItem } from "@/lib/nav-config"
+import { homeNav, pipelineNav, toolsNav, type NavItem } from "@/lib/nav-config"
 import { cn } from "@/lib/utils"
 
 function SectionHeader({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
@@ -63,6 +63,10 @@ export function AppSidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-3">
+        <div className="mb-2">
+          <NavRow item={homeNav} active={homeNav.href === pathname} />
+        </div>
+
         <SectionHeader icon={Workflow} label="Project Pipeline" />
         <div className="flex flex-col gap-0.5">
           {pipelineNav.map((item) => (
