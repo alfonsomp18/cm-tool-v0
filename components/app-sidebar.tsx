@@ -1,20 +1,38 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Workflow, LifeBuoy, Wrench, ChevronDown, Server } from "lucide-react"
 import { homeNav, pipelineNav, toolsNav, type NavItem } from "@/lib/nav-config"
 import { cn } from "@/lib/utils"
 
-function SectionHeader({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
+function SectionHeader({
+  icon: Icon,
+  label,
+  open,
+  onToggle,
+}: {
+  icon: React.ElementType
+  label: string
+  open: boolean
+  onToggle: () => void
+}) {
   return (
-    <div className="flex items-center justify-between px-3 py-2">
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      className="flex w-full items-center justify-between rounded-lg px-3 py-2 hover:bg-secondary"
+    >
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm font-semibold text-foreground">{label}</span>
       </div>
-      <ChevronDown className="h-4 w-4 text-muted-foreground" />
-    </div>
+      <ChevronDown
+        className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", !open && "-rotate-90")}
+      />
+    </button>
   )
 }
 
@@ -49,8 +67,19 @@ function NavRow({ item, active }: { item: NavItem; active: boolean }) {
   return <button className={className}>{content}</button>
 }
 
+type SectionKey = "pipeline" | "support" | "tools"
+
 export function AppSidebar() {
   const pathname = usePathname()
+  const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
+    pipeline: true,
+    support: true,
+    tools: true,
+  })
+
+  function toggleSection(key: SectionKey) {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
 
   return (
     <aside className="flex w-72 shrink-0 flex-col border-r border-border bg-card">
@@ -67,28 +96,43 @@ export function AppSidebar() {
           <NavRow item={homeNav} active={homeNav.href === pathname} />
         </div>
 
-        <SectionHeader icon={Workflow} label="Project Pipeline" />
-        <div className="flex flex-col gap-0.5">
-          {pipelineNav.map((item) => (
-            <NavRow key={item.label} item={item} active={item.href === pathname} />
-          ))}
-        </div>
-
-        <div className="mt-4">
-          <div className="flex items-center gap-2 px-3 py-2">
-            <LifeBuoy className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-semibold text-foreground">Support &amp; Troubleshoot</span>
-            <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
-          </div>
-        </div>
-
-        <div className="mt-2">
-          <SectionHeader icon={Wrench} label="Tools" />
+        <SectionHeader
+          icon={Workflow}
+          label="Project Pipeline"
+          open={openSections.pipeline}
+          onToggle={() => toggleSection("pipeline")}
+        />
+        {openSections.pipeline && (
           <div className="flex flex-col gap-0.5">
-            {toolsNav.map((item) => (
+            {pipelineNav.map((item) => (
               <NavRow key={item.label} item={item} active={item.href === pathname} />
             ))}
           </div>
+        )}
+
+        <div className="mt-4">
+          <SectionHeader
+            icon={LifeBuoy}
+            label="Support & Troubleshoot"
+            open={openSections.support}
+            onToggle={() => toggleSection("support")}
+          />
+        </div>
+
+        <div className="mt-2">
+          <SectionHeader
+            icon={Wrench}
+            label="Tools"
+            open={openSections.tools}
+            onToggle={() => toggleSection("tools")}
+          />
+          {openSections.tools && (
+            <div className="flex flex-col gap-0.5">
+              {toolsNav.map((item) => (
+                <NavRow key={item.label} item={item} active={item.href === pathname} />
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground">
