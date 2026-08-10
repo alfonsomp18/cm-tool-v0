@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import { Menu, Zap, Check } from "lucide-react"
 import { pipelineNav } from "@/lib/nav-config"
+import { useProject } from "@/lib/project-context"
 import { cn } from "@/lib/utils"
 
 type StageState = "done" | "active" | "todo"
@@ -41,6 +42,8 @@ function StageNode({
 
 export function AppHeader() {
   const pathname = usePathname()
+  const { selectedProject, setSelectedProject } = useProject()
+  const projectSelected = Boolean(selectedProject)
   const matchedIndex = steps.findIndex((step) => step.href === pathname)
   const activeIndex = matchedIndex === -1 ? steps.length - 1 : matchedIndex
 
@@ -74,19 +77,44 @@ export function AppHeader() {
       </div>
 
       <div className="flex items-center gap-2.5">
-        <select className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm outline-none">
-          <option>Embraport UAT</option>
+        <select
+          value={selectedProject}
+          onChange={(e) => setSelectedProject(e.target.value)}
+          className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm outline-none"
+        >
+          <option value="">Select a project...</option>
+          <option value="embraport-uat">Embraport UAT</option>
+          <option value="embraport-prod">Embraport PROD</option>
+          <option value="contoso-uat">Contoso Freight UAT</option>
         </select>
-        <span className="rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground">
-          UAT - AWS AMER | Embraport
-        </span>
-        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="h-2 w-2 rounded-full bg-success" />
-          Connected (29m)
-        </span>
-        <div className="flex overflow-hidden rounded-lg border border-border text-xs font-semibold">
-          <button className="bg-background px-2.5 py-1.5 text-muted-foreground">PT</button>
-          <button className="bg-foreground px-2.5 py-1.5 text-background">EN</button>
+
+        <div
+          className={cn(
+            "flex items-center gap-2.5 transition-opacity",
+            !projectSelected && "pointer-events-none opacity-40",
+          )}
+        >
+          <span className="rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+            UAT - AWS AMER | Embraport
+          </span>
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="h-2 w-2 rounded-full bg-success" />
+            Connected (29m)
+          </span>
+          <div className="flex overflow-hidden rounded-lg border border-border text-xs font-semibold">
+            <button
+              disabled={!projectSelected}
+              className="bg-background px-2.5 py-1.5 text-muted-foreground disabled:pointer-events-none"
+            >
+              PT
+            </button>
+            <button
+              disabled={!projectSelected}
+              className="bg-foreground px-2.5 py-1.5 text-background disabled:pointer-events-none"
+            >
+              EN
+            </button>
+          </div>
         </div>
       </div>
     </header>
