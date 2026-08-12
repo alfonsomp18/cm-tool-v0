@@ -32,7 +32,13 @@ export interface NavItem {
 export const homeNav: NavItem = { label: "Home", href: "/", icon: Home }
 
 export const pipelineNav: NavItem[] = [
-  { label: "Configuration Projects", shortLabel: "Config", icon: ListChecks, step: 1 },
+  {
+    label: "Configuration Projects",
+    shortLabel: "Config",
+    href: "/configuration-projects",
+    icon: ListChecks,
+    step: 1,
+  },
   {
     label: "Data Ingestion",
     shortLabel: "Ingestion",
@@ -41,23 +47,35 @@ export const pipelineNav: NavItem[] = [
     step: 2,
     description: "Pull in source data before it's mapped and configured.",
   },
-  { label: "Automated Configurations", shortLabel: "Automation", icon: Settings2, step: 3 },
-  { label: "Automated ERP Code Mapping", icon: Code2 },
+  {
+    label: "Automated Configurations",
+    shortLabel: "Automation",
+    href: "/automated-configurations",
+    icon: Settings2,
+    step: 3,
+  },
+  { label: "Automated ERP Code Mapping", href: "/erp-code-mapping", icon: Code2 },
   {
     label: "Custom Authorities",
     href: "/custom-authorities",
     icon: ShieldCheck,
     description: "Review and edit generated tax authorities before execution.",
   },
-  { label: "Automated Testing", shortLabel: "Testing", icon: FlaskConical, step: 4 },
+  {
+    label: "Automated Testing",
+    shortLabel: "Testing",
+    href: "/automated-testing",
+    icon: FlaskConical,
+    step: 4,
+  },
 ]
 
 export const toolsNav: NavItem[] = [
-  { label: "API Connection", icon: Plug },
-  { label: "OpenArena AI", icon: Sparkles },
-  { label: "REST/SOAP Mapping", icon: ArrowLeftRight },
-  { label: "Snowflake", icon: Snowflake },
-  { label: "Request History", icon: History },
-  { label: "Documentation", icon: FileText },
-  { label: "Welcome / Tour", icon: Compass },
+  { label: "API Connection", href: "/api-connection", icon: Plug },
+  { label: "OpenArena AI", href: "/openarena-ai", icon: Sparkles },
+  { label: "REST/SOAP Mapping", href: "/rest-soap-mapping", icon: ArrowLeftRight },
+  { label: "Snowflake", href: "/snowflake", icon: Snowflake },
+  { label: "Request History", href: "/request-history", icon: History },
+  { label: "Documentation", href: "/documentation", icon: FileText },
+  { label: "Welcome / Tour", href: "/welcome-tour", icon: Compass },
 ]
