@@ -58,7 +58,7 @@ export function AppHeader() {
           <Zap className="h-4 w-4" />
         </div>
         <span className="text-balance text-base font-bold text-foreground">
-          ONESOURCE IDT Professional Services Studio
+          End-to-End Certificate Manager tool
         </span>
       </div>
 
