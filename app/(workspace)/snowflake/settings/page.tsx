@@ -1,12 +1,12 @@
-import { Snowflake } from "lucide-react"
+import { Settings } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { ComingSoon } from "@/components/coming-soon"
 
-export default function SnowflakePage() {
+export default function SnowflakeSettingsPage() {
   return (
     <>
       <PageHeader title="Snowflake" tabsBasePath="/snowflake" />
-      <ComingSoon icon={Snowflake} label="Snowflake" />
+      <ComingSoon icon={Settings} label="Settings" />
     </>
   )
 }

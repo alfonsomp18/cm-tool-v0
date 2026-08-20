@@ -4,7 +4,7 @@ import { AuthoritiesTable } from "@/features/custom-authorities/authorities-tabl
 export default function CustomAuthoritiesPage() {
   return (
     <>
-      <PageHeader title="Custom Authorities" />
+      <PageHeader title="Custom Authorities" tabsBasePath="/custom-authorities" />
       <AuthoritiesTable />
     </>
   )

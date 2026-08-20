@@ -1,12 +1,12 @@
-import { ListChecks } from "lucide-react"
+import { Activity } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { ComingSoon } from "@/components/coming-soon"
 
-export default function ConfigurationProjectsPage() {
+export default function ConfigurationProjectsActivityPage() {
   return (
     <>
       <PageHeader title="Configuration Projects" tabsBasePath="/configuration-projects" />
-      <ComingSoon icon={ListChecks} label="Configuration Projects" />
+      <ComingSoon icon={Activity} label="Activity" />
     </>
   )
 }
