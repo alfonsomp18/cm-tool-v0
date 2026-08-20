@@ -1,12 +1,12 @@
-import { Compass } from "lucide-react"
+import { Activity } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { ComingSoon } from "@/components/coming-soon"
 
-export default function WelcomeTourPage() {
+export default function WelcomeTourActivityPage() {
   return (
     <>
       <PageHeader title="Welcome / Tour" tabsBasePath="/welcome-tour" />
-      <ComingSoon icon={Compass} label="Welcome / Tour" />
+      <ComingSoon icon={Activity} label="Activity" />
     </>
   )
 }

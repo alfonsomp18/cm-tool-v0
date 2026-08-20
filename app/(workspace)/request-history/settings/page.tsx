@@ -1,12 +1,12 @@
-import { History } from "lucide-react"
+import { Settings } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { ComingSoon } from "@/components/coming-soon"
 
-export default function RequestHistoryPage() {
+export default function RequestHistorySettingsPage() {
   return (
     <>
       <PageHeader title="Request History" tabsBasePath="/request-history" />
-      <ComingSoon icon={History} label="Request History" />
+      <ComingSoon icon={Settings} label="Settings" />
     </>
   )
 }

@@ -1,12 +1,12 @@
-import { Sparkles } from "lucide-react"
+import { Activity } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { ComingSoon } from "@/components/coming-soon"
 
-export default function OpenArenaAiPage() {
+export default function OpenArenaAiActivityPage() {
   return (
     <>
       <PageHeader title="OpenArena AI" tabsBasePath="/openarena-ai" />
-      <ComingSoon icon={Sparkles} label="OpenArena AI" />
+      <ComingSoon icon={Activity} label="Activity" />
     </>
   )
 }

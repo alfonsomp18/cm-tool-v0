@@ -1,12 +1,12 @@
-import { Plug } from "lucide-react"
+import { Settings } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { ComingSoon } from "@/components/coming-soon"
 
-export default function ApiConnectionPage() {
+export default function ApiConnectionSettingsPage() {
   return (
     <>
       <PageHeader title="API Connection" tabsBasePath="/api-connection" />
-      <ComingSoon icon={Plug} label="API Connection" />
+      <ComingSoon icon={Settings} label="Settings" />
     </>
   )
 }
