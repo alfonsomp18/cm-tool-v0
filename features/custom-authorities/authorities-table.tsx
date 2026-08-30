@@ -5,6 +5,9 @@ import { ChevronDown, Trash2, X, Play } from "lucide-react"
 import { authorities, type Authority } from "./authorities-data"
 import { cn } from "@/lib/utils"
 
+const actionOptions: Authority["action"][] = ["Create", "Existing", "Update"]
+const typeOptions = [...new Set(authorities.map((a) => a.type))].sort()
+
 function StatusBadge({ status }: { status: Authority["status"] }) {
   return (
     <span
@@ -32,7 +35,22 @@ function CountPill({ value }: { value: number }) {
 }
 
 export function AuthoritiesTable() {
+  const [rows, setRows] = useState<Authority[]>(authorities)
   const [selected, setSelected] = useState<Set<string>>(new Set(authorities.map((a) => a.id)))
+  const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set())
+  const [search, setSearch] = useState("")
+  const [actionFilter, setActionFilter] = useState<string>("all")
+  const [typeFilter, setTypeFilter] = useState<string>("all")
+
+  const query = search.trim().toLowerCase()
+  const filteredRows = rows.filter((r) => {
+    if (actionFilter !== "all" && r.action !== actionFilter) return false
+    if (typeFilter !== "all" && r.type !== typeFilter) return false
+    if (query && !`${r.name} ${r.type} ${r.erpCode}`.toLowerCase().includes(query)) return false
+    return true
+  })
+
+  const allFilteredSelected = filteredRows.length > 0 && filteredRows.every((r) => selected.has(r.id))
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -43,7 +61,42 @@ export function AuthoritiesTable() {
     })
   }
 
-  const allSelected = selected.size === authorities.length
+  function toggleSelectAll() {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      filteredRows.forEach((r) => (allFilteredSelected ? next.delete(r.id) : next.add(r.id)))
+      return next
+    })
+  }
+
+  function updateField(id: string, field: "name" | "type" | "erpCode", value: string) {
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)))
+    setDirtyIds((prev) => new Set(prev).add(id))
+  }
+
+  function removeRow(id: string) {
+    setRows((prev) => prev.filter((r) => r.id !== id))
+    setSelected((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setDirtyIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+  }
+
+  function deleteSelected() {
+    setRows((prev) => prev.filter((r) => !selected.has(r.id)))
+    setDirtyIds((prev) => {
+      const next = new Set(prev)
+      selected.forEach((id) => next.delete(id))
+      return next
+    })
+    setSelected(new Set())
+  }
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -52,14 +105,34 @@ export function AuthoritiesTable() {
         <div className="flex flex-1 flex-wrap items-center gap-2">
           <input
             type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, type, ERP code..."
             className="min-w-64 flex-1 rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
           />
-          <select className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus:border-input">
-            <option>All Actions</option>
+          <select
+            value={actionFilter}
+            onChange={(e) => setActionFilter(e.target.value)}
+            className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus:border-input"
+          >
+            <option value="all">All Actions</option>
+            {actionOptions.map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
           </select>
-          <select className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus:border-input">
-            <option>All Types</option>
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus:border-input"
+          >
+            <option value="all">All Types</option>
+            {typeOptions.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
           </select>
           <button
             aria-label="More filters"
@@ -70,13 +143,23 @@ export function AuthoritiesTable() {
           </button>
         </div>
 
-        <div className="flex items-center gap-2 border-l border-border pl-3">
-          <select className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none">
+        <div className="flex items-center gap-3 border-l border-border pl-3">
+          <span className="text-xs text-muted-foreground">
+            {selected.size} of {rows.length} selected
+          </span>
+          <select
+            disabled={selected.size === 0}
+            className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
             <option>Bulk action</option>
           </select>
-          <button className="flex items-center gap-1.5 rounded-lg border border-destructive px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10">
+          <button
+            onClick={deleteSelected}
+            disabled={selected.size === 0}
+            className="flex items-center gap-1.5 rounded-lg border border-destructive px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+          >
             <Trash2 className="h-4 w-4" />
-            Delete Selected
+            Delete Selected{selected.size > 0 ? ` (${selected.size})` : ""}
           </button>
         </div>
       </div>
@@ -94,10 +177,8 @@ export function AuthoritiesTable() {
               <th className="w-10 px-3 py-3">
                 <input
                   type="checkbox"
-                  checked={allSelected}
-                  onChange={() =>
-                    setSelected(allSelected ? new Set() : new Set(authorities.map((a) => a.id)))
-                  }
+                  checked={allFilteredSelected}
+                  onChange={toggleSelectAll}
                   className="h-4 w-4 accent-foreground"
                 />
               </th>
@@ -113,7 +194,14 @@ export function AuthoritiesTable() {
             </tr>
           </thead>
           <tbody>
-            {authorities.map((a, i) => (
+            {filteredRows.length === 0 && (
+              <tr>
+                <td colSpan={10} className="px-3 py-8 text-center text-sm text-muted-foreground">
+                  No authorities match your filters.
+                </td>
+              </tr>
+            )}
+            {filteredRows.map((a, i) => (
               <tr
                 key={a.id}
                 className={cn(
@@ -130,20 +218,31 @@ export function AuthoritiesTable() {
                   />
                 </td>
                 <td className="px-3 py-2">
-                  <input
-                    defaultValue={a.name}
-                    className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
-                  />
+                  <div className="flex items-center gap-1.5">
+                    {dirtyIds.has(a.id) && (
+                      <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                        title="Unsaved changes"
+                      />
+                    )}
+                    <input
+                      value={a.name}
+                      onChange={(e) => updateField(a.id, "name", e.target.value)}
+                      className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
+                    />
+                  </div>
                 </td>
                 <td className="px-3 py-2">
                   <input
-                    defaultValue={a.type}
+                    value={a.type}
+                    onChange={(e) => updateField(a.id, "type", e.target.value)}
                     className="w-24 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
                   />
                 </td>
                 <td className="px-3 py-2">
                   <input
-                    defaultValue={a.erpCode}
+                    value={a.erpCode}
+                    onChange={(e) => updateField(a.id, "erpCode", e.target.value)}
                     className="w-24 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
                   />
                 </td>
@@ -163,7 +262,11 @@ export function AuthoritiesTable() {
                   <StatusBadge status={a.status} />
                 </td>
                 <td className="px-3 py-2">
-                  <button className="rounded-lg p-1.5 text-destructive hover:bg-destructive/10" aria-label="Remove">
+                  <button
+                    onClick={() => removeRow(a.id)}
+                    className="rounded-lg p-1.5 text-destructive hover:bg-destructive/10"
+                    aria-label={`Remove ${a.name}`}
+                  >
                     <X className="h-4 w-4" />
                   </button>
                 </td>
