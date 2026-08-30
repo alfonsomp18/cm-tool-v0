@@ -88,6 +88,10 @@ export function AppHeader() {
           <option value="contoso-uat">Contoso Freight UAT</option>
         </select>
 
+        {!projectSelected && (
+          <span className="text-xs text-muted-foreground">Select a project to get started</span>
+        )}
+
         <div
           className={cn(
             "flex items-center gap-2.5 transition-opacity",
