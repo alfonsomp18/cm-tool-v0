@@ -27,6 +27,8 @@ export interface NavItem {
   step?: number
   /** One-line blurb shown on the home screen's tile. Only set for built pages. */
   description?: string
+  /** True only once the page has real functionality, not just a placeholder. */
+  implemented?: boolean
 }
 
 export const homeNav: NavItem = { label: "Home", href: "/", icon: Home }
@@ -60,6 +62,7 @@ export const pipelineNav: NavItem[] = [
     href: "/custom-authorities",
     icon: ShieldCheck,
     description: "Review and edit generated tax authorities before execution.",
+    implemented: true,
   },
   {
     label: "Automated Testing",

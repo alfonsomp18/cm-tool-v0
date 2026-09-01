@@ -4,9 +4,21 @@ import { useState } from "react"
 import { ChevronDown, Trash2, X, Play } from "lucide-react"
 import { authorities, type Authority } from "./authorities-data"
 import { cn } from "@/lib/utils"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog"
 
 const actionOptions: Authority["action"][] = ["Create", "Existing", "Update"]
 const typeOptions = [...new Set(authorities.map((a) => a.type))].sort()
+
+type PendingDelete = { type: "bulk" } | { type: "row"; id: string; name: string }
 
 function StatusBadge({ status }: { status: Authority["status"] }) {
   return (
@@ -41,6 +53,7 @@ export function AuthoritiesTable() {
   const [search, setSearch] = useState("")
   const [actionFilter, setActionFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null)
 
   const query = search.trim().toLowerCase()
   const filteredRows = rows.filter((r) => {
@@ -96,6 +109,12 @@ export function AuthoritiesTable() {
       return next
     })
     setSelected(new Set())
+  }
+
+  function confirmPendingDelete() {
+    if (pendingDelete?.type === "bulk") deleteSelected()
+    else if (pendingDelete?.type === "row") removeRow(pendingDelete.id)
+    setPendingDelete(null)
   }
 
   return (
@@ -154,7 +173,7 @@ export function AuthoritiesTable() {
             <option>Bulk action</option>
           </select>
           <button
-            onClick={deleteSelected}
+            onClick={() => setPendingDelete({ type: "bulk" })}
             disabled={selected.size === 0}
             className="flex items-center gap-1.5 rounded-lg border border-destructive px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
           >
@@ -263,7 +282,7 @@ export function AuthoritiesTable() {
                 </td>
                 <td className="px-3 py-2">
                   <button
-                    onClick={() => removeRow(a.id)}
+                    onClick={() => setPendingDelete({ type: "row", id: a.id, name: a.name })}
                     className="rounded-lg p-1.5 text-destructive hover:bg-destructive/10"
                     aria-label={`Remove ${a.name}`}
                   >
@@ -283,6 +302,31 @@ export function AuthoritiesTable() {
           Proceed to Execution
         </button>
       </div>
+
+      <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingDelete?.type === "bulk"
+                ? `Delete ${selected.size} ${selected.size === 1 ? "authority" : "authorities"}?`
+                : `Delete "${pendingDelete?.type === "row" ? pendingDelete.name : ""}"?`}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This can&apos;t be undone. This will permanently remove{" "}
+              {pendingDelete?.type === "bulk" ? "the selected authorities" : "this authority"} from the list.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmPendingDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

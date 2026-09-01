@@ -71,6 +71,7 @@ type SectionKey = "pipeline" | "support" | "tools"
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const [query, setQuery] = useState("")
   const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
     pipeline: true,
     support: true,
@@ -81,67 +82,93 @@ export function AppSidebar() {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
+  const isSearching = query.trim().length > 0
+  const matches = (item: NavItem) => item.label.toLowerCase().includes(query.trim().toLowerCase())
+
+  const homeVisible = !isSearching || matches(homeNav)
+  const filteredPipeline = isSearching ? pipelineNav.filter(matches) : pipelineNav
+  const filteredTools = isSearching ? toolsNav.filter(matches) : toolsNav
+  const noResults = isSearching && !homeVisible && filteredPipeline.length === 0 && filteredTools.length === 0
+
   return (
     <aside className="flex w-72 shrink-0 flex-col border-r border-border bg-card">
       <div className="border-b border-border p-3">
         <input
           type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Search endpoint..."
           className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
         />
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-3">
-        <div className="mb-2">
-          <NavRow item={homeNav} active={homeNav.href === pathname} />
-        </div>
+        {noResults && (
+          <p className="px-3 py-2 text-sm text-muted-foreground">No matches for &quot;{query.trim()}&quot;</p>
+        )}
 
-        <SectionHeader
-          icon={Workflow}
-          label="Project Pipeline"
-          open={openSections.pipeline}
-          onToggle={() => toggleSection("pipeline")}
-        />
-        {openSections.pipeline && (
-          <div className="flex flex-col gap-0.5">
-            {pipelineNav.map((item) => (
-              <NavRow key={item.label} item={item} active={item.href === pathname} />
-            ))}
+        {homeVisible && (
+          <div className="mb-2">
+            <NavRow item={homeNav} active={homeNav.href === pathname} />
           </div>
         )}
 
-        <div className="mt-4">
-          <SectionHeader
-            icon={LifeBuoy}
-            label="Support & Troubleshoot"
-            open={openSections.support}
-            onToggle={() => toggleSection("support")}
-          />
-        </div>
+        {(!isSearching || filteredPipeline.length > 0) && (
+          <>
+            <SectionHeader
+              icon={Workflow}
+              label="Project Pipeline"
+              open={isSearching || openSections.pipeline}
+              onToggle={() => toggleSection("pipeline")}
+            />
+            {(isSearching || openSections.pipeline) && (
+              <div className="flex flex-col gap-0.5">
+                {filteredPipeline.map((item) => (
+                  <NavRow key={item.label} item={item} active={item.href === pathname} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
 
-        <div className="mt-2">
-          <SectionHeader
-            icon={Wrench}
-            label="Tools"
-            open={openSections.tools}
-            onToggle={() => toggleSection("tools")}
-          />
-          {openSections.tools && (
-            <div className="flex flex-col gap-0.5">
-              {toolsNav.map((item) => (
-                <NavRow key={item.label} item={item} active={item.href === pathname} />
-              ))}
-            </div>
-          )}
-        </div>
+        {!isSearching && (
+          <div className="mt-4">
+            <SectionHeader
+              icon={LifeBuoy}
+              label="Support & Troubleshoot"
+              open={openSections.support}
+              onToggle={() => toggleSection("support")}
+            />
+          </div>
+        )}
 
-        <div className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground">
-          <Server className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium text-foreground">API Endpoints</span>
-          <span className="ml-auto rounded-full bg-foreground px-2 py-0.5 text-[11px] font-semibold text-background">
-            142
-          </span>
-        </div>
+        {(!isSearching || filteredTools.length > 0) && (
+          <div className="mt-2">
+            <SectionHeader
+              icon={Wrench}
+              label="Tools"
+              open={isSearching || openSections.tools}
+              onToggle={() => toggleSection("tools")}
+            />
+            {(isSearching || openSections.tools) && (
+              <div className="flex flex-col gap-0.5">
+                {filteredTools.map((item) => (
+                  <NavRow key={item.label} item={item} active={item.href === pathname} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {!isSearching && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground">
+            <Server className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium text-foreground">API Endpoints</span>
+            <span className="ml-auto rounded-full bg-foreground px-2 py-0.5 text-[11px] font-semibold text-background">
+              142
+            </span>
+          </div>
+        )}
       </nav>
 
       <div className="border-t border-border px-4 py-2 text-xs text-muted-foreground">
