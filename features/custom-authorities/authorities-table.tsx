@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { ChevronDown, Trash2, X, Play } from "lucide-react"
-import { authorities, type Authority } from "./authorities-data"
+import { useMemo, useState } from "react"
+import { toast } from "sonner"
+import { ChevronDown, Trash2, X, Play, AlertTriangle } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import type { Authority } from "./authorities-data"
 import { cn } from "@/lib/utils"
 import {
   AlertDialog,
@@ -16,7 +18,9 @@ import {
 } from "@/components/ui/alert-dialog"
 
 const actionOptions: Authority["action"][] = ["Create", "Existing", "Update"]
-const typeOptions = [...new Set(authorities.map((a) => a.type))].sort()
+
+const editableColumns = { name: "name", type: "type", erpCode: "erp_code" } as const
+type EditableField = keyof typeof editableColumns
 
 type PendingDelete = { type: "bulk" } | { type: "row"; id: string; name: string }
 
@@ -46,14 +50,24 @@ function CountPill({ value }: { value: number }) {
   )
 }
 
-export function AuthoritiesTable() {
-  const [rows, setRows] = useState<Authority[]>(authorities)
-  const [selected, setSelected] = useState<Set<string>>(new Set(authorities.map((a) => a.id)))
+export function AuthoritiesTable({
+  initialAuthorities,
+  fetchError,
+}: {
+  initialAuthorities: Authority[]
+  fetchError: string | null
+}) {
+  const supabase = useMemo(() => createClient(), [])
+  const [rows, setRows] = useState<Authority[]>(initialAuthorities)
+  const [selected, setSelected] = useState<Set<string>>(new Set(initialAuthorities.map((a) => a.id)))
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState("")
   const [actionFilter, setActionFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const typeOptions = useMemo(() => [...new Set(rows.map((r) => r.type))].sort(), [rows])
 
   const query = search.trim().toLowerCase()
   const filteredRows = rows.filter((r) => {
@@ -82,12 +96,38 @@ export function AuthoritiesTable() {
     })
   }
 
-  function updateField(id: string, field: "name" | "type" | "erpCode", value: string) {
+  function updateField(id: string, field: EditableField, value: string) {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)))
     setDirtyIds((prev) => new Set(prev).add(id))
   }
 
-  function removeRow(id: string) {
+  async function persistField(id: string, field: EditableField) {
+    if (!dirtyIds.has(id)) return
+    const row = rows.find((r) => r.id === id)
+    if (!row) return
+
+    const { error } = await supabase
+      .from("authorities")
+      .update({ [editableColumns[field]]: row[field] })
+      .eq("id", id)
+
+    if (error) {
+      toast.error(`Couldn't save "${row.name}": ${error.message}`)
+      return
+    }
+    setDirtyIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+  }
+
+  async function removeRow(id: string, name: string) {
+    const { error } = await supabase.from("authorities").delete().eq("id", id)
+    if (error) {
+      toast.error(`Couldn't delete "${name}": ${error.message}`)
+      return
+    }
     setRows((prev) => prev.filter((r) => r.id !== id))
     setSelected((prev) => {
       const next = new Set(prev)
@@ -99,26 +139,43 @@ export function AuthoritiesTable() {
       next.delete(id)
       return next
     })
+    toast.success(`Deleted "${name}"`)
   }
 
-  function deleteSelected() {
+  async function deleteSelected() {
+    const ids = [...selected]
+    const { error } = await supabase.from("authorities").delete().in("id", ids)
+    if (error) {
+      toast.error(`Couldn't delete selected authorities: ${error.message}`)
+      return
+    }
     setRows((prev) => prev.filter((r) => !selected.has(r.id)))
     setDirtyIds((prev) => {
       const next = new Set(prev)
-      selected.forEach((id) => next.delete(id))
+      ids.forEach((id) => next.delete(id))
       return next
     })
     setSelected(new Set())
+    toast.success(`Deleted ${ids.length} ${ids.length === 1 ? "authority" : "authorities"}`)
   }
 
-  function confirmPendingDelete() {
-    if (pendingDelete?.type === "bulk") deleteSelected()
-    else if (pendingDelete?.type === "row") removeRow(pendingDelete.id)
+  async function confirmPendingDelete() {
+    setIsDeleting(true)
+    if (pendingDelete?.type === "bulk") await deleteSelected()
+    else if (pendingDelete?.type === "row") await removeRow(pendingDelete.id, pendingDelete.name)
+    setIsDeleting(false)
     setPendingDelete(null)
   }
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
+      {fetchError && (
+        <div className="mx-6 mt-4 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          Couldn&apos;t load authorities: {fetchError}
+        </div>
+      )}
+
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 px-6 py-4">
         <div className="flex flex-1 flex-wrap items-center gap-2">
@@ -185,7 +242,7 @@ export function AuthoritiesTable() {
 
       {/* Generated banner */}
       <div className="mx-6 mb-3 rounded-xl border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">79</span> authorities generated
+        <span className="font-semibold text-foreground">{rows.length}</span> authorities generated
       </div>
 
       {/* Table */}
@@ -216,7 +273,7 @@ export function AuthoritiesTable() {
             {filteredRows.length === 0 && (
               <tr>
                 <td colSpan={10} className="px-3 py-8 text-center text-sm text-muted-foreground">
-                  No authorities match your filters.
+                  {rows.length === 0 ? "No authorities yet." : "No authorities match your filters."}
                 </td>
               </tr>
             )}
@@ -247,6 +304,7 @@ export function AuthoritiesTable() {
                     <input
                       value={a.name}
                       onChange={(e) => updateField(a.id, "name", e.target.value)}
+                      onBlur={() => persistField(a.id, "name")}
                       className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
                     />
                   </div>
@@ -255,6 +313,7 @@ export function AuthoritiesTable() {
                   <input
                     value={a.type}
                     onChange={(e) => updateField(a.id, "type", e.target.value)}
+                    onBlur={() => persistField(a.id, "type")}
                     className="w-24 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
                   />
                 </td>
@@ -262,6 +321,7 @@ export function AuthoritiesTable() {
                   <input
                     value={a.erpCode}
                     onChange={(e) => updateField(a.id, "erpCode", e.target.value)}
+                    onBlur={() => persistField(a.id, "erpCode")}
                     className="w-24 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
                   />
                 </td>
@@ -303,7 +363,7 @@ export function AuthoritiesTable() {
         </button>
       </div>
 
-      <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
+      <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && !isDeleting && setPendingDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -313,16 +373,17 @@ export function AuthoritiesTable() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               This can&apos;t be undone. This will permanently remove{" "}
-              {pendingDelete?.type === "bulk" ? "the selected authorities" : "this authority"} from the list.
+              {pendingDelete?.type === "bulk" ? "the selected authorities" : "this authority"} from the database.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmPendingDelete}
+              disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
