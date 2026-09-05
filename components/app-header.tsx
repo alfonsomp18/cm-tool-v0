@@ -1,9 +1,10 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-import { Menu, Zap, Check } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { Menu, Zap, Check, LogOut } from "lucide-react"
 import { pipelineNav } from "@/lib/nav-config"
 import { useProject } from "@/lib/project-context"
+import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 
 type StageState = "done" | "active" | "todo"
@@ -40,12 +41,26 @@ function StageNode({
   )
 }
 
-export function AppHeader() {
+interface ProjectOption {
+  id: string
+  name: string
+  environment: string
+}
+
+export function AppHeader({ projects, userEmail }: { projects: ProjectOption[]; userEmail: string }) {
   const pathname = usePathname()
+  const router = useRouter()
   const { selectedProject, setSelectedProject } = useProject()
   const projectSelected = Boolean(selectedProject)
   const matchedIndex = steps.findIndex((step) => step.href === pathname)
   const activeIndex = matchedIndex === -1 ? steps.length - 1 : matchedIndex
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push("/login")
+    router.refresh()
+  }
 
   return (
     <header className="flex flex-col border-b border-border bg-card">
@@ -70,10 +85,12 @@ export function AppHeader() {
             onChange={(e) => setSelectedProject(e.target.value)}
             className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm font-medium outline-none"
           >
-            <option value="">Select a project...</option>
-            <option value="embraport-uat">Embraport UAT</option>
-            <option value="embraport-prod">Embraport PROD</option>
-            <option value="contoso-uat">Contoso Freight UAT</option>
+            {projects.length === 0 && <option value="">No projects yet</option>}
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} {p.environment}
+              </option>
+            ))}
           </select>
 
           <div
@@ -100,6 +117,20 @@ export function AppHeader() {
                 EN
               </button>
             </div>
+          </div>
+
+          <div className="flex items-center gap-2 border-l border-border pl-3">
+            <span className="max-w-[10rem] truncate text-xs text-muted-foreground" title={userEmail}>
+              {userEmail}
+            </span>
+            <button
+              onClick={handleSignOut}
+              aria-label="Sign out"
+              title="Sign out"
+              className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>
