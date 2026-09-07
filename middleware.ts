@@ -27,16 +27,21 @@ export async function middleware(request: NextRequest) {
 
   const isLoginPage = request.nextUrl.pathname.startsWith("/login")
 
+  function withSupabaseCookies(response: NextResponse) {
+    supabaseResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie))
+    return response
+  }
+
   if (!user && !isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
-    return NextResponse.redirect(url)
+    return withSupabaseCookies(NextResponse.redirect(url))
   }
 
   if (user && isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = "/"
-    return NextResponse.redirect(url)
+    return withSupabaseCookies(NextResponse.redirect(url))
   }
 
   return supabaseResponse

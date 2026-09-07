@@ -1,12 +1,11 @@
-import { cookies } from "next/headers"
 import { PageHeader } from "@/components/page-header"
 import { AuthoritiesTable } from "@/features/custom-authorities/authorities-table"
 import { createClient } from "@/lib/supabase/server"
 import { mapAuthorityRow, type AuthorityRow } from "@/features/custom-authorities/authorities-data"
+import { getCurrentProject } from "@/lib/current-project"
 
 export default async function CustomAuthoritiesPage() {
-  const cookieStore = await cookies()
-  const projectId = cookieStore.get("selected_project")?.value
+  const { projectId } = await getCurrentProject()
 
   if (!projectId) {
     return (
