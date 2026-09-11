@@ -26,17 +26,23 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const isLoginPage = request.nextUrl.pathname.startsWith("/login")
+  const isAuthConfirmRoute = request.nextUrl.pathname.startsWith("/auth/confirm")
 
-  if (!user && !isLoginPage) {
+  function withSupabaseCookies(response: NextResponse) {
+    supabaseResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie))
+    return response
+  }
+
+  if (!user && !isLoginPage && !isAuthConfirmRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
-    return NextResponse.redirect(url)
+    return withSupabaseCookies(NextResponse.redirect(url))
   }
 
   if (user && isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = "/"
-    return NextResponse.redirect(url)
+    return withSupabaseCookies(NextResponse.redirect(url))
   }
 
   return supabaseResponse
