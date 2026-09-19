@@ -16,13 +16,13 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
     redirect("/login")
   }
 
-  const { projects, projectId } = await getCurrentProject()
+  const { projects, projectId, error: projectsError } = await getCurrentProject()
 
   return (
     <ProjectProvider initialProject={projectId}>
       <div className="flex h-screen flex-col overflow-hidden bg-background font-sans text-foreground">
         <MenuBar />
-        <AppHeader projects={projects} userEmail={user.email ?? ""} />
+        <AppHeader projects={projects} userEmail={user.email ?? ""} projectsError={projectsError} />
 
         <div className="flex flex-1 overflow-hidden">
           <AppSidebar />

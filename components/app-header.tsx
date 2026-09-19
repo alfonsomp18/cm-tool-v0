@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, Zap, Check, LogOut } from "lucide-react"
+import { AlertTriangle, Menu, Zap, Check, LogOut } from "lucide-react"
 import { pipelineNav } from "@/lib/nav-config"
 import { useProject } from "@/lib/project-context"
 import { createClient } from "@/lib/supabase/client"
@@ -47,7 +47,15 @@ interface ProjectOption {
   environment: string
 }
 
-export function AppHeader({ projects, userEmail }: { projects: ProjectOption[]; userEmail: string }) {
+export function AppHeader({
+  projects,
+  userEmail,
+  projectsError,
+}: {
+  projects: ProjectOption[]
+  userEmail: string
+  projectsError?: string | null
+}) {
   const pathname = usePathname()
   const router = useRouter()
   const { selectedProject, setSelectedProject } = useProject()
@@ -85,13 +93,25 @@ export function AppHeader({ projects, userEmail }: { projects: ProjectOption[]; 
             onChange={(e) => setSelectedProject(e.target.value)}
             className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm font-medium outline-none"
           >
-            {projects.length === 0 && <option value="">No projects yet</option>}
+            {projects.length === 0 && (
+              <option value="">{projectsError ? "Couldn't load projects" : "No projects yet"}</option>
+            )}
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name} {p.environment}
               </option>
             ))}
           </select>
+
+          {projectsError && (
+            <span
+              className="flex items-center gap-1 text-xs text-destructive"
+              title={projectsError}
+            >
+              <AlertTriangle className="h-3.5 w-3.5" />
+              Couldn&apos;t load projects
+            </span>
+          )}
 
           <div
             className={cn(
