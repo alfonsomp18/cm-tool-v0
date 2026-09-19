@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 
 export const getCurrentProject = cache(async () => {
   const supabase = await createClient()
-  const { data: projects } = await supabase
+  const { data: projects, error } = await supabase
     .from("projects")
     .select("id, name, environment")
     .order("created_at", { ascending: true })
@@ -14,5 +14,5 @@ export const getCurrentProject = cache(async () => {
   const projectId =
     cookieProject && projects?.some((p) => p.id === cookieProject) ? cookieProject : (projects?.[0]?.id ?? "")
 
-  return { projects: projects ?? [], projectId }
+  return { projects: projects ?? [], projectId, error: error?.message ?? null }
 })
