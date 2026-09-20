@@ -93,8 +93,10 @@ export function AppHeader({
             onChange={(e) => setSelectedProject(e.target.value)}
             className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm font-medium outline-none"
           >
-            {projects.length === 0 && (
+            {projects.length === 0 ? (
               <option value="">{projectsError ? "Couldn't load projects" : "No projects yet"}</option>
+            ) : (
+              <option value="">Select a project...</option>
             )}
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
