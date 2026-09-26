@@ -1,7 +1,8 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useRef, useState, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { setSelectedProjectCookie } from "@/lib/actions/project"
 
 interface ProjectContextValue {
@@ -20,10 +21,23 @@ export function ProjectProvider({
 }) {
   const router = useRouter()
   const [selectedProject, setSelectedProjectState] = useState(initialProject)
+  const persistedProject = useRef(initialProject)
+  const latestRequest = useRef(0)
 
   function setSelectedProject(project: string) {
+    const requestId = ++latestRequest.current
     setSelectedProjectState(project)
-    void setSelectedProjectCookie(project).then(() => router.refresh())
+
+    setSelectedProjectCookie(project)
+      .then(() => {
+        persistedProject.current = project
+        if (requestId === latestRequest.current) router.refresh()
+      })
+      .catch(() => {
+        if (requestId !== latestRequest.current) return
+        setSelectedProjectState(persistedProject.current)
+        toast.error("Couldn't switch project. Please try again.")
+      })
   }
 
   return (
