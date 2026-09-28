@@ -45,7 +45,15 @@ export async function middleware(request: NextRequest) {
     return withSupabaseCookies(NextResponse.redirect(url))
   }
 
-  return supabaseResponse
+  // Forward the verified user so downstream Server Components (e.g. the
+  // workspace layout) can trust it via headers() instead of paying for a
+  // second auth.getUser() round-trip to re-derive what was just confirmed
+  // here. Always overwrite both headers (even to "") so a client-supplied
+  // value can never pass through.
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set("x-user-id", user?.id ?? "")
+  requestHeaders.set("x-user-email", user?.email ?? "")
+  return withSupabaseCookies(NextResponse.next({ request: { headers: requestHeaders } }))
 }
 
 export const config = {
