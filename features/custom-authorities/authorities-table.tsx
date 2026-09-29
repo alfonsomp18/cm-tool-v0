@@ -29,7 +29,7 @@ function StatusBadge({ status }: { status: Authority["status"] }) {
     <span
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium",
-        status === "pending" && "bg-accent/15 text-accent",
+        status === "pending" && "bg-warning/15 text-warning",
         status === "success" && "bg-success/15 text-success",
         status === "error" && "bg-destructive/15 text-destructive",
       )}
@@ -297,7 +297,7 @@ export function AuthoritiesTable({
                   <div className="flex items-center gap-1.5">
                     {dirtyIds.has(a.id) && (
                       <span
-                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning"
                         title="Unsaved changes"
                       />
                     )}
