@@ -82,7 +82,7 @@ export function AppHeader({
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Zap className="h-4 w-4" />
           </div>
-          <span className="text-balance text-base font-bold text-foreground">
+          <span className="text-balance text-base font-medium tracking-tight text-foreground">
             End-to-End Certificate Manager tool
           </span>
         </div>
