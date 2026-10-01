@@ -64,7 +64,7 @@ export default function LoginPage() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Zap className="h-4 w-4" />
           </div>
-          <span className="text-base font-bold text-foreground">End-to-End Certificate Manager tool</span>
+          <span className="text-base font-medium tracking-tight text-foreground">End-to-End Certificate Manager tool</span>
         </div>
 
         <h1 className="mb-1 text-lg font-semibold text-foreground">
