@@ -9,7 +9,7 @@ function byImplementedFirst(items: NavItem[]) {
 function TileSection({ title, items }: { title: string; items: NavItem[] }) {
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+      <h2 className="text-sm font-medium tracking-tight text-muted-foreground">{title}</h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
           <HomeTile key={item.label} item={item} />

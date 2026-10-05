@@ -37,7 +37,7 @@ export function PageHeader({ title, tabsBasePath }: { title: string; tabsBasePat
         {section && (
           <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{section}</span>
         )}
-        <h1 className="text-xl font-bold text-foreground">{title}</h1>
+        <h1 className="text-xl font-medium tracking-tight text-foreground">{title}</h1>
       </div>
       {tabsBasePath && <ModuleTabs basePath={tabsBasePath} />}
     </div>
