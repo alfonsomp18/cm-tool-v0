@@ -13,7 +13,7 @@ export function HomeTile({ item }: { item: NavItem }) {
         <Icon className="h-5 w-5" />
       </div>
       <div className="flex flex-1 flex-col gap-1">
-        <span className="text-sm font-semibold text-foreground">{item.label}</span>
+        <span className="text-sm font-medium tracking-tight text-foreground">{item.label}</span>
         {item.description && <span className="text-xs text-muted-foreground">{item.description}</span>}
       </div>
       {implemented ? (
