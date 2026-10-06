@@ -9,7 +9,12 @@ export function HomeTile({ item }: { item: NavItem }) {
 
   const content = (
     <>
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-foreground">
+      <div
+        className={cn(
+          "flex h-10 w-10 items-center justify-center rounded-lg bg-secondary",
+          implemented ? "text-foreground" : "text-muted-foreground",
+        )}
+      >
         <Icon className="h-5 w-5" />
       </div>
       <div className="flex flex-1 flex-col gap-1">
@@ -17,14 +22,12 @@ export function HomeTile({ item }: { item: NavItem }) {
         {item.description && <span className="text-xs text-muted-foreground">{item.description}</span>}
       </div>
       {implemented ? (
-        <span className="flex items-center gap-1 text-xs font-medium text-primary">
+        <span className="flex items-center gap-1 text-xs font-medium text-foreground">
           Open
           <ArrowRight className="h-3.5 w-3.5" />
         </span>
       ) : (
-        <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-          Coming soon
-        </span>
+        <span className="text-[11px] text-muted-foreground">Coming soon</span>
       )}
     </>
   )
@@ -35,7 +38,7 @@ export function HomeTile({ item }: { item: NavItem }) {
         href={item.href}
         className={cn(
           "flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors",
-          implemented ? "hover:border-primary/40 hover:shadow-sm" : "hover:border-input",
+          implemented ? "hover:border-foreground/25" : "hover:border-input",
         )}
       >
         {content}
