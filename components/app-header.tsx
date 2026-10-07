@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation"
-import { AlertTriangle, Menu, Zap, Check, LogOut } from "lucide-react"
+import { AlertTriangle, Zap, Check, LogOut } from "lucide-react"
 import { pipelineNav } from "@/lib/nav-config"
 import { useProject } from "@/lib/project-context"
 import { createClient } from "@/lib/supabase/client"
@@ -72,12 +72,8 @@ export function AppHeader({
 
   return (
     <header className="flex flex-col border-b border-border bg-card">
-      {/* Row 1: brand + project switcher + secondary status */}
+      {/* Row 1: brand + project switcher + account */}
       <div className="flex items-center gap-4 px-4 py-3">
-        <button className="rounded-lg p-2 text-muted-foreground hover:bg-secondary" aria-label="Toggle menu">
-          <Menu className="h-5 w-5" />
-        </button>
-
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Zap className="h-4 w-4" />
@@ -114,32 +110,6 @@ export function AppHeader({
               Couldn&apos;t load projects
             </span>
           )}
-
-          <div
-            className={cn(
-              "flex items-center gap-3 border-l border-border pl-3 transition-opacity",
-              !projectSelected && "pointer-events-none opacity-40",
-            )}
-          >
-            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="h-2 w-2 rounded-full bg-success" />
-              Connected (29m)
-            </span>
-            <div className="flex overflow-hidden rounded-lg border border-border text-xs font-semibold">
-              <button
-                disabled={!projectSelected}
-                className="bg-background px-2.5 py-1.5 text-muted-foreground disabled:pointer-events-none"
-              >
-                PT
-              </button>
-              <button
-                disabled={!projectSelected}
-                className="bg-foreground px-2.5 py-1.5 text-background disabled:pointer-events-none"
-              >
-                EN
-              </button>
-            </div>
-          </div>
 
           <div className="flex items-center gap-2 border-l border-border pl-3">
             <span className="max-w-[10rem] truncate text-xs text-muted-foreground" title={userEmail}>
