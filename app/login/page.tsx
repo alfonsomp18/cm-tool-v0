@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { Zap } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -58,7 +59,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
+      <ThemeToggle className="absolute right-4 top-4" />
       <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-sm">
         <div className="mb-6 flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">

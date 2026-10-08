@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { AlertTriangle, Zap, Check, LogOut } from "lucide-react"
 import { pipelineNav } from "@/lib/nav-config"
 import { useProject } from "@/lib/project-context"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 
@@ -115,6 +116,7 @@ export function AppHeader({
             <span className="max-w-[10rem] truncate text-xs text-muted-foreground" title={userEmail}>
               {userEmail}
             </span>
+            <ThemeToggle />
             <button
               onClick={handleSignOut}
               aria-label="Sign out"
