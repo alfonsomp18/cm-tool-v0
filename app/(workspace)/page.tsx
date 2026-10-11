@@ -23,7 +23,7 @@ export default function HomePage() {
   return (
     <>
       <PageHeader title="Home" />
-      <div className="flex-1 overflow-auto px-6 py-6">
+      <div className="flex-1 overflow-auto px-4 py-6 md:px-6">
         <div className="flex flex-col gap-8">
           <TileSection title="Project Pipeline" items={byImplementedFirst(pipelineNav)} />
           <TileSection title="Tools" items={byImplementedFirst(toolsNav)} />

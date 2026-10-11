@@ -5,6 +5,7 @@ import { AlertTriangle, Zap, Check, LogOut } from "lucide-react"
 import { pipelineNav } from "@/lib/nav-config"
 import { useProject } from "@/lib/project-context"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { MobileNavTrigger } from "@/components/mobile-nav"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 
@@ -35,7 +36,12 @@ function StageNode({
       >
         {state === "done" ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
       </div>
-      <span className={cn("text-xs font-medium", state === "active" ? "text-primary" : "text-muted-foreground")}>
+      <span
+        className={cn(
+          "text-xs font-medium",
+          state === "active" ? "text-primary" : "text-muted-foreground hidden md:inline",
+        )}
+      >
         {label}
       </span>
     </div>
@@ -74,21 +80,23 @@ export function AppHeader({
   return (
     <header className="flex flex-col border-b border-border bg-card">
       {/* Row 1: brand + project switcher + account */}
-      <div className="flex items-center gap-4 px-4 py-3">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+      <div className="flex items-center gap-2 px-3 py-3 sm:gap-4 sm:px-4">
+        <MobileNavTrigger className="-ml-1" />
+
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Zap className="h-4 w-4" />
           </div>
-          <span className="text-balance text-base font-medium tracking-tight text-foreground">
+          <span className="hidden truncate text-base font-medium tracking-tight text-foreground sm:inline">
             End-to-End Certificate Manager tool
           </span>
         </div>
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
           <select
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
-            className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm font-medium outline-none"
+            className="min-w-0 max-w-[9.5rem] rounded-lg border border-input bg-background px-2 py-1.5 text-sm font-medium outline-none sm:max-w-[14rem] sm:px-3"
           >
             {projects.length === 0 ? (
               <option value="">{projectsError ? "Couldn't load projects" : "No projects yet"}</option>
@@ -108,12 +116,12 @@ export function AppHeader({
               title={projectsError}
             >
               <AlertTriangle className="h-3.5 w-3.5" />
-              Couldn&apos;t load projects
+              <span className="hidden md:inline">Couldn&apos;t load projects</span>
             </span>
           )}
 
-          <div className="flex items-center gap-2 border-l border-border pl-3">
-            <span className="max-w-[10rem] truncate text-xs text-muted-foreground" title={userEmail}>
+          <div className="flex shrink-0 items-center gap-1 border-l border-border pl-2 sm:gap-2 sm:pl-3">
+            <span className="hidden max-w-[10rem] truncate text-xs text-muted-foreground lg:inline" title={userEmail}>
               {userEmail}
             </span>
             <ThemeToggle />
@@ -132,14 +140,14 @@ export function AppHeader({
       {/* Row 2: Flow — only meaningful once a project is selected */}
       <div className="flex items-center justify-center border-t border-border px-4 py-2.5">
         {projectSelected ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             {steps.map((step, i) => {
               const state: StageState = i < activeIndex ? "done" : i === activeIndex ? "active" : "todo"
               return (
-                <div key={step.label} className="flex items-center gap-3">
+                <div key={step.label} className="flex items-center gap-2 md:gap-3">
                   <StageNode label={step.shortLabel ?? step.label} icon={step.icon} state={state} />
                   {i < steps.length - 1 && (
-                    <div className={cn("h-0.5 w-8 rounded-full", state === "done" ? "bg-success" : "bg-border")} />
+                    <div className={cn("h-0.5 w-4 rounded-full md:w-8", state === "done" ? "bg-success" : "bg-border")} />
                   )}
                 </div>
               )

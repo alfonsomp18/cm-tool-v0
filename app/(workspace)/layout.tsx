@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AppHeader } from "@/components/app-header"
 import { MenuBar } from "@/components/menu-bar"
+import { MobileNavDrawer, MobileNavProvider } from "@/components/mobile-nav"
 import { ProjectProvider } from "@/lib/project-context"
 import { getCurrentProject } from "@/lib/current-project"
 
@@ -22,15 +23,18 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
 
   return (
     <ProjectProvider initialProject={projectId}>
-      <div className="flex h-screen flex-col overflow-hidden bg-background font-sans text-foreground">
-        <MenuBar />
-        <AppHeader projects={projects} userEmail={userEmail} projectsError={projectsError} />
+      <MobileNavProvider>
+        <div className="flex h-dvh flex-col overflow-hidden bg-background font-sans text-foreground">
+          <MenuBar />
+          <AppHeader projects={projects} userEmail={userEmail} projectsError={projectsError} />
 
-        <div className="flex flex-1 overflow-hidden">
-          <AppSidebar />
-          <main className="flex flex-1 flex-col overflow-hidden">{children}</main>
+          <div className="flex flex-1 overflow-hidden">
+            <AppSidebar className="hidden md:flex" />
+            <main className="flex min-w-0 flex-1 flex-col overflow-hidden">{children}</main>
+          </div>
         </div>
-      </div>
+        <MobileNavDrawer />
+      </MobileNavProvider>
     </ProjectProvider>
   )
 }

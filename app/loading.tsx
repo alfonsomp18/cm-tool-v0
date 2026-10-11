@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Loading() {
   return (
-    <div role="status" aria-label="Loading" className="flex h-screen flex-col overflow-hidden bg-background">
+    <div role="status" aria-label="Loading" className="flex h-dvh flex-col overflow-hidden bg-background">
       <div className="flex items-center gap-4 border-b border-border bg-card px-4 py-3">
         <Skeleton className="h-8 w-8 rounded-lg" />
         <Skeleton className="h-5 w-64" />

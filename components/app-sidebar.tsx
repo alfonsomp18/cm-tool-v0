@@ -69,7 +69,7 @@ function NavRow({ item, active }: { item: NavItem; active: boolean }) {
 
 type SectionKey = "pipeline" | "support" | "tools"
 
-export function AppSidebar() {
+export function AppSidebar({ className }: { className?: string }) {
   const pathname = usePathname()
   const [query, setQuery] = useState("")
   const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
@@ -91,7 +91,7 @@ export function AppSidebar() {
   const noResults = isSearching && !homeVisible && filteredPipeline.length === 0 && filteredTools.length === 0
 
   return (
-    <aside className="flex w-72 shrink-0 flex-col border-r border-border bg-card">
+    <aside className={cn("flex w-72 shrink-0 flex-col border-r border-border bg-card", className)}>
       <div className="border-b border-border p-3">
         <input
           type="search"
