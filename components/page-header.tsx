@@ -24,7 +24,7 @@ export function PageHeader({ title, tabsBasePath }: { title: string; tabsBasePat
 
   return (
     <div className="border-b border-border bg-card">
-      <div className="flex flex-col gap-1 px-6 py-4">
+      <div className="flex flex-col gap-1 px-4 py-4 md:px-6">
         {!isHome && (
           <Link
             href="/"

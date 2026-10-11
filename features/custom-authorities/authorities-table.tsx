@@ -170,14 +170,14 @@ export function AuthoritiesTable({
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {fetchError && (
-        <div className="mx-6 mt-4 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+        <div className="mx-4 md:mx-6 mt-4 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           Couldn&apos;t load authorities: {fetchError}
         </div>
       )}
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 px-6 py-4">
+      <div className="flex flex-wrap items-center gap-3 px-4 py-4 md:px-6">
         <div className="flex flex-1 flex-wrap items-center gap-2">
           <input
             type="search"
@@ -219,7 +219,7 @@ export function AuthoritiesTable({
           </button>
         </div>
 
-        <div className="flex items-center gap-3 border-l border-border pl-3">
+        <div className="flex items-center gap-3 md:border-l md:border-border md:pl-3">
           <span className="text-xs text-muted-foreground">
             {selected.size} of {rows.length} selected
           </span>
@@ -241,13 +241,13 @@ export function AuthoritiesTable({
       </div>
 
       {/* Generated banner */}
-      <div className="mx-6 mb-3 rounded-xl border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground">
+      <div className="mx-4 md:mx-6 mb-3 rounded-xl border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground">
         <span className="font-semibold text-foreground">{rows.length}</span> authorities generated
       </div>
 
       {/* Table */}
-      <div className="mx-6 flex-1 overflow-auto rounded-xl border border-border bg-card">
-        <table className="w-full border-collapse text-sm">
+      <div className="mx-4 md:mx-6 flex-1 overflow-auto rounded-xl border border-border bg-card">
+        <table className="w-full min-w-[56rem] border-collapse text-sm">
           <thead className="sticky top-0 bg-secondary">
             <tr className="text-left text-xs font-semibold text-muted-foreground">
               <th className="w-10 px-3 py-3">
@@ -356,7 +356,7 @@ export function AuthoritiesTable({
       </div>
 
       {/* Footer action */}
-      <div className="flex justify-end px-6 py-4">
+      <div className="flex justify-end px-4 py-4 md:px-6">
         <button className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90">
           <Play className="h-4 w-4" />
           Proceed to Execution

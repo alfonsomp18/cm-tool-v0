@@ -6,12 +6,12 @@ export default function Loading() {
     <>
       <PageHeader title="Custom Authorities" tabsBasePath="/custom-authorities" />
       <div role="status" aria-label="Loading authorities" className="flex flex-1 flex-col gap-3 overflow-hidden py-4">
-        <div className="mx-6 flex items-center gap-3">
+        <div className="mx-4 md:mx-6 flex items-center gap-3">
           <Skeleton className="h-9 w-64 rounded-lg" />
           <Skeleton className="h-9 w-28 rounded-lg" />
           <Skeleton className="ml-auto h-9 w-40 rounded-lg" />
         </div>
-        <div className="mx-6 flex-1 overflow-hidden rounded-xl border border-border bg-card">
+        <div className="mx-4 md:mx-6 flex-1 overflow-hidden rounded-xl border border-border bg-card">
           <div className="border-b border-border bg-secondary px-3 py-3">
             <Skeleton className="h-4 w-full max-w-xl" />
           </div>
