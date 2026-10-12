@@ -1,11 +1,24 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { ChevronDown, Trash2, X, Play, AlertTriangle } from "lucide-react"
+import { ChevronDown, Trash2, Play, AlertTriangle, SlidersHorizontal, MoreHorizontal, Copy } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { Authority } from "./authorities-data"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -23,6 +36,36 @@ const editableColumns = { name: "name", type: "type", erpCode: "erp_code" } as c
 type EditableField = keyof typeof editableColumns
 
 type PendingDelete = { type: "bulk" } | { type: "row"; id: string; name: string }
+
+// The name column (and the checkbox and row-menu columns around it) are always shown.
+const optionalColumns = [
+  { id: "type", label: "Type" },
+  { id: "erpCode", label: "ERP Code" },
+  { id: "location", label: "Location" },
+  { id: "rates", label: "Rates" },
+  { id: "rules", label: "Rules" },
+  { id: "action", label: "Action" },
+  { id: "status", label: "Status" },
+] as const
+type ColumnId = (typeof optionalColumns)[number]["id"]
+type Density = "comfortable" | "compact"
+
+const VIEW_PREFS_KEY = "authorities-table-view"
+const columnIds = new Set<string>(optionalColumns.map((c) => c.id))
+
+function loadViewPrefs(): { density: Density; hidden: Set<ColumnId> } | null {
+  try {
+    const raw = window.localStorage.getItem(VIEW_PREFS_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return {
+      density: parsed.density === "compact" ? "compact" : "comfortable",
+      hidden: new Set((Array.isArray(parsed.hidden) ? parsed.hidden : []).filter((id: string) => columnIds.has(id))),
+    }
+  } catch {
+    return null
+  }
+}
 
 function StatusBadge({ status }: { status: Authority["status"] }) {
   return (
@@ -66,6 +109,51 @@ export function AuthoritiesTable({
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [density, setDensity] = useState<Density>("comfortable")
+  const [hiddenColumns, setHiddenColumns] = useState<Set<ColumnId>>(new Set())
+  const [prefsLoaded, setPrefsLoaded] = useState(false)
+
+  // Saved view preferences are read after mount so the server render and first client render match.
+  useEffect(() => {
+    const prefs = loadViewPrefs()
+    if (prefs) {
+      setDensity(prefs.density)
+      setHiddenColumns(prefs.hidden)
+    }
+    setPrefsLoaded(true)
+  }, [])
+
+  useEffect(() => {
+    if (!prefsLoaded) return
+    try {
+      window.localStorage.setItem(VIEW_PREFS_KEY, JSON.stringify({ density, hidden: [...hiddenColumns] }))
+    } catch {
+      // Storage can be unavailable (private mode, blocked); the view just won't persist.
+    }
+  }, [density, hiddenColumns, prefsLoaded])
+
+  const show = (id: ColumnId) => !hiddenColumns.has(id)
+  const visibleCount = optionalColumns.length - hiddenColumns.size
+  const cellY = density === "compact" ? "py-1" : "py-2"
+  const inputY = density === "compact" ? "py-0.5" : "py-1"
+
+  function setColumnVisible(id: ColumnId, visible: boolean) {
+    setHiddenColumns((prev) => {
+      const next = new Set(prev)
+      if (visible) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  async function copyErpCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code)
+      toast.success("ERP code copied")
+    } catch {
+      toast.error("Couldn't copy to the clipboard")
+    }
+  }
 
   const typeOptions = useMemo(() => [...new Set(rows.map((r) => r.type))].sort(), [rows])
 
@@ -210,13 +298,38 @@ export function AuthoritiesTable({
               </option>
             ))}
           </select>
-          <button
-            aria-label="More filters"
-            title="More filters"
-            className="rounded-lg border border-transparent p-2 text-muted-foreground hover:border-input hover:bg-secondary hover:text-foreground"
-          >
-            <ChevronDown className="h-4 w-4" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 gap-1.5 bg-card font-normal text-muted-foreground">
+                <SlidersHorizontal />
+                View
+                {hiddenColumns.size > 0 && (
+                  <span className="rounded-full bg-secondary px-1.5 text-[11px] text-foreground">
+                    {hiddenColumns.size} hidden
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuLabel>Density</DropdownMenuLabel>
+              <DropdownMenuRadioGroup value={density} onValueChange={(v) => setDensity(v as Density)}>
+                <DropdownMenuRadioItem value="comfortable">Comfortable</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="compact">Compact</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Columns</DropdownMenuLabel>
+              {optionalColumns.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col.id}
+                  checked={show(col.id)}
+                  onCheckedChange={(checked) => setColumnVisible(col.id, checked)}
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  {col.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="flex items-center gap-3 md:border-l md:border-border md:pl-3">
@@ -247,53 +360,57 @@ export function AuthoritiesTable({
 
       {/* Table */}
       <div className="mx-4 md:mx-6 flex-1 overflow-auto rounded-xl border border-border bg-card">
-        <table className="w-full min-w-[56rem] border-collapse text-sm">
-          <thead className="sticky top-0 bg-secondary">
+        <table
+          className="w-full border-collapse text-sm"
+          style={{ minWidth: `${16 + visibleCount * 6}rem` }}
+        >
+          <thead className="sticky top-0 z-20 bg-secondary">
             <tr className="text-left text-xs font-semibold text-muted-foreground">
-              <th className="w-10 px-3 py-3">
-                <input
-                  type="checkbox"
+              <th className="sticky left-0 z-10 w-10 min-w-10 bg-secondary px-3 py-3">
+                <Checkbox
                   checked={allFilteredSelected}
-                  onChange={toggleSelectAll}
-                  className="h-4 w-4 accent-foreground"
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Select all authorities"
                 />
               </th>
-              <th className="px-3 py-3">Authority Name</th>
-              <th className="px-3 py-3">Type</th>
-              <th className="px-3 py-3">ERP Code</th>
-              <th className="px-3 py-3">Location</th>
-              <th className="px-3 py-3">Rates</th>
-              <th className="px-3 py-3">Rules</th>
-              <th className="px-3 py-3">Action</th>
-              <th className="px-3 py-3">Status</th>
-              <th className="w-10 px-3 py-3" />
+              <th className="sticky left-10 z-10 min-w-56 bg-secondary px-3 py-3 shadow-[inset_-1px_0_0_var(--border)]">
+                Authority Name
+              </th>
+              {show("type") && <th className="px-3 py-3">Type</th>}
+              {show("erpCode") && <th className="px-3 py-3">ERP Code</th>}
+              {show("location") && <th className="px-3 py-3">Location</th>}
+              {show("rates") && <th className="px-3 py-3">Rates</th>}
+              {show("rules") && <th className="px-3 py-3">Rules</th>}
+              {show("action") && <th className="px-3 py-3">Action</th>}
+              {show("status") && <th className="px-3 py-3">Status</th>}
+              <th className="w-10 px-3 py-3">
+                <span className="sr-only">Row actions</span>
+              </th>
             </tr>
           </thead>
           <tbody>
             {filteredRows.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-3 py-8 text-center text-sm text-muted-foreground">
+                <td colSpan={3 + visibleCount} className="px-3 py-8 text-center text-sm text-muted-foreground">
                   {rows.length === 0 ? "No authorities yet." : "No authorities match your filters."}
                 </td>
               </tr>
             )}
-            {filteredRows.map((a, i) => (
-              <tr
-                key={a.id}
-                className={cn(
-                  "border-t border-border hover:bg-secondary/50",
-                  i % 2 === 1 && "bg-muted/30",
-                )}
-              >
-                <td className="px-3 py-2">
-                  <input
-                    type="checkbox"
+            {filteredRows.map((a) => (
+              <tr key={a.id} className="group border-t border-border hover:bg-muted">
+                <td className={cn("sticky left-0 z-10 w-10 min-w-10 bg-card px-3 group-hover:bg-muted", cellY)}>
+                  <Checkbox
                     checked={selected.has(a.id)}
-                    onChange={() => toggle(a.id)}
-                    className="h-4 w-4 accent-foreground"
+                    onCheckedChange={() => toggle(a.id)}
+                    aria-label={`Select ${a.name}`}
                   />
                 </td>
-                <td className="px-3 py-2">
+                <td
+                  className={cn(
+                    "sticky left-10 z-10 min-w-56 bg-card px-3 shadow-[inset_-1px_0_0_var(--border)] group-hover:bg-muted",
+                    cellY,
+                  )}
+                >
                   <div className="flex items-center gap-1.5">
                     {dirtyIds.has(a.id) && (
                       <span
@@ -305,49 +422,84 @@ export function AuthoritiesTable({
                       value={a.name}
                       onChange={(e) => updateField(a.id, "name", e.target.value)}
                       onBlur={() => persistField(a.id, "name")}
-                      className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
+                      className={cn(
+                        "w-full rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40",
+                        inputY,
+                      )}
                     />
                   </div>
                 </td>
-                <td className="px-3 py-2">
-                  <input
-                    value={a.type}
-                    onChange={(e) => updateField(a.id, "type", e.target.value)}
-                    onBlur={() => persistField(a.id, "type")}
-                    className="w-24 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
-                  />
-                </td>
-                <td className="px-3 py-2">
-                  <input
-                    value={a.erpCode}
-                    onChange={(e) => updateField(a.id, "erpCode", e.target.value)}
-                    onBlur={() => persistField(a.id, "erpCode")}
-                    className="w-24 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40"
-                  />
-                </td>
-                <td className="px-3 py-2 text-muted-foreground">{a.location}</td>
-                <td className="px-3 py-2">
-                  <CountPill value={a.rates} />
-                </td>
-                <td className="px-3 py-2">
-                  <CountPill value={a.rules} />
-                </td>
-                <td className="px-3 py-2">
-                  <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground">
-                    {a.action}
-                  </span>
-                </td>
-                <td className="px-3 py-2">
-                  <StatusBadge status={a.status} />
-                </td>
-                <td className="px-3 py-2">
-                  <button
-                    onClick={() => setPendingDelete({ type: "row", id: a.id, name: a.name })}
-                    className="rounded-lg p-1.5 text-destructive hover:bg-destructive/10"
-                    aria-label={`Remove ${a.name}`}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                {show("type") && (
+                  <td className={cn("px-3", cellY)}>
+                    <input
+                      value={a.type}
+                      onChange={(e) => updateField(a.id, "type", e.target.value)}
+                      onBlur={() => persistField(a.id, "type")}
+                      className={cn(
+                        "w-24 rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40",
+                        inputY,
+                      )}
+                    />
+                  </td>
+                )}
+                {show("erpCode") && (
+                  <td className={cn("px-3", cellY)}>
+                    <input
+                      value={a.erpCode}
+                      onChange={(e) => updateField(a.id, "erpCode", e.target.value)}
+                      onBlur={() => persistField(a.id, "erpCode")}
+                      className={cn(
+                        "w-24 rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40",
+                        inputY,
+                      )}
+                    />
+                  </td>
+                )}
+                {show("location") && <td className={cn("px-3 text-muted-foreground", cellY)}>{a.location}</td>}
+                {show("rates") && (
+                  <td className={cn("px-3", cellY)}>
+                    <CountPill value={a.rates} />
+                  </td>
+                )}
+                {show("rules") && (
+                  <td className={cn("px-3", cellY)}>
+                    <CountPill value={a.rules} />
+                  </td>
+                )}
+                {show("action") && (
+                  <td className={cn("px-3", cellY)}>
+                    <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground">
+                      {a.action}
+                    </span>
+                  </td>
+                )}
+                {show("status") && (
+                  <td className={cn("px-3", cellY)}>
+                    <StatusBadge status={a.status} />
+                  </td>
+                )}
+                <td className={cn("px-3", cellY)}>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${a.name}`} className="size-7">
+                        <MoreHorizontal />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem disabled={!a.erpCode} onSelect={() => copyErpCode(a.erpCode)}>
+                        <Copy />
+                        Copy ERP code
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onSelect={() => setPendingDelete({ type: "row", id: a.id, name: a.name })}
+                      >
+                        <Trash2 />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </td>
               </tr>
             ))}
