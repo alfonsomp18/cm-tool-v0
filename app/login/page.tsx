@@ -2,13 +2,28 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import { Zap } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { AuthCard } from "@/components/auth-card"
+import { PasswordInput } from "@/components/password-input"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+type Mode = "sign-in" | "sign-up" | "forgot"
+
+const copy: Record<Mode, { title: string; description: string; submit: string }> = {
+  "sign-in": { title: "Sign in", description: "Welcome back.", submit: "Sign in" },
+  "sign-up": { title: "Create an account", description: "Get started with your own project.", submit: "Create account" },
+  forgot: {
+    title: "Reset your password",
+    description: "Enter your email and we'll send you a link to choose a new password.",
+    submit: "Send reset link",
+  },
+}
 
 export default function LoginPage() {
   const router = useRouter()
-  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in")
+  const [mode, setMode] = useState<Mode>("sign-in")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -24,12 +39,32 @@ export default function LoginPage() {
     }
   }, [])
 
+  function switchMode(next: Mode) {
+    setMode(next)
+    setError(null)
+    setInfo(null)
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setInfo(null)
     setLoading(true)
     const supabase = createClient()
+
+    if (mode === "forgot") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/confirm?next=/reset-password`,
+      })
+      setLoading(false)
+      if (error) {
+        setError(error.message)
+        return
+      }
+      // Same message whether or not the account exists, so this can't be used to probe for emails.
+      setInfo("If an account exists for that email, a reset link is on its way. Check your inbox.")
+      return
+    }
 
     if (mode === "sign-in") {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -59,78 +94,74 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
-      <ThemeToggle className="absolute right-4 top-4" />
-      <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-sm">
-        <div className="mb-6 flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Zap className="h-4 w-4" />
-          </div>
-          <span className="text-base font-medium tracking-tight text-foreground">End-to-End Certificate Manager tool</span>
+    <AuthCard title={copy[mode].title} description={copy[mode].description}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </div>
 
-        <h1 className="mb-1 text-lg font-semibold text-foreground">
-          {mode === "sign-in" ? "Sign in" : "Create an account"}
-        </h1>
-        <p className="mb-5 text-sm text-muted-foreground">
-          {mode === "sign-in" ? "Welcome back." : "Get started with your own project."}
-        </p>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted-foreground" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted-foreground" htmlFor="password">
-              Password
-            </label>
-            <input
+        {mode !== "forgot" && (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              {mode === "sign-in" && (
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => switchMode("forgot")}
+                  className="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground"
+                >
+                  Forgot password?
+                </Button>
+              )}
+            </div>
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
               required
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
             />
           </div>
+        )}
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          {info && <p className="text-sm text-success">{info}</p>}
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        {info && (
+          <p role="status" className="text-sm text-success">
+            {info}
+          </p>
+        )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-          >
-            {loading ? "Please wait..." : mode === "sign-in" ? "Sign in" : "Create account"}
-          </button>
-        </form>
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? "Please wait..." : copy[mode].submit}
+        </Button>
+      </form>
 
-        <button
-          type="button"
-          onClick={() => {
-            setMode(mode === "sign-in" ? "sign-up" : "sign-in")
-            setError(null)
-            setInfo(null)
-          }}
-          className="mt-4 text-xs text-muted-foreground hover:text-foreground"
-        >
-          {mode === "sign-in" ? "Don't have an account? Create one" : "Already have an account? Sign in"}
-        </button>
-      </div>
-    </div>
+      <Button
+        type="button"
+        variant="link"
+        onClick={() => switchMode(mode === "sign-in" ? "sign-up" : "sign-in")}
+        className="mt-4 h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground"
+      >
+        {mode === "sign-in"
+          ? "Don't have an account? Create one"
+          : mode === "sign-up"
+            ? "Already have an account? Sign in"
+            : "Back to sign in"}
+      </Button>
+    </AuthCard>
   )
 }
