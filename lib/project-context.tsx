@@ -24,6 +24,15 @@ export function ProjectProvider({
   const persistedProject = useRef(initialProject)
   const latestRequest = useRef(0)
 
+  // The provider stays mounted across server refreshes, so follow the server's value when it changes
+  // (e.g. after the first project is created). useState alone would keep showing the old one.
+  const [seenInitialProject, setSeenInitialProject] = useState(initialProject)
+  if (initialProject !== seenInitialProject) {
+    setSeenInitialProject(initialProject)
+    setSelectedProjectState(initialProject)
+    persistedProject.current = initialProject
+  }
+
   function setSelectedProject(project: string) {
     const requestId = ++latestRequest.current
     setSelectedProjectState(project)

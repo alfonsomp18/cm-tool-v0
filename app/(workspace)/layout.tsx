@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { AppHeader } from "@/components/app-header"
 import { MenuBar } from "@/components/menu-bar"
 import { MobileNavDrawer, MobileNavProvider } from "@/components/mobile-nav"
+import { NoProjectsState, ProjectsLoadError } from "@/components/workspace-empty-states"
 import { ProjectProvider } from "@/lib/project-context"
 import { getCurrentProject } from "@/lib/current-project"
 
@@ -30,7 +31,9 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
 
           <div className="flex flex-1 overflow-hidden">
             <AppSidebar className="hidden md:flex" />
-            <main className="flex min-w-0 flex-1 flex-col overflow-hidden">{children}</main>
+            <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+              {projectsError ? <ProjectsLoadError /> : projects.length === 0 ? <NoProjectsState /> : children}
+            </main>
           </div>
         </div>
         <MobileNavDrawer />
