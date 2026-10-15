@@ -272,12 +272,12 @@ export function AuthoritiesTable({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, type, ERP code..."
-            className="min-w-64 flex-1 rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+            className="min-w-64 flex-1 rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:border-ring focus-ring"
           />
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus:border-input"
+            className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus-visible:border-ring focus-ring"
           >
             <option value="all">All Actions</option>
             {actionOptions.map((a) => (
@@ -289,7 +289,7 @@ export function AuthoritiesTable({
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus:border-input"
+            className="rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground outline-none hover:border-input hover:bg-secondary hover:text-foreground focus-visible:border-ring focus-ring"
           >
             <option value="all">All Types</option>
             {typeOptions.map((t) => (
@@ -338,7 +338,7 @@ export function AuthoritiesTable({
           </span>
           <select
             disabled={selected.size === 0}
-            className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:border-ring focus-ring disabled:cursor-not-allowed disabled:opacity-50"
           >
             <option>Bulk action</option>
           </select>
@@ -423,7 +423,7 @@ export function AuthoritiesTable({
                       onChange={(e) => updateField(a.id, "name", e.target.value)}
                       onBlur={() => persistField(a.id, "name")}
                       className={cn(
-                        "w-full rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40",
+                        "w-full rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:bg-background focus-visible:border-ring focus-ring",
                         inputY,
                       )}
                     />
@@ -436,7 +436,7 @@ export function AuthoritiesTable({
                       onChange={(e) => updateField(a.id, "type", e.target.value)}
                       onBlur={() => persistField(a.id, "type")}
                       className={cn(
-                        "w-24 rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40",
+                        "w-24 rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:bg-background focus-visible:border-ring focus-ring",
                         inputY,
                       )}
                     />
@@ -449,7 +449,7 @@ export function AuthoritiesTable({
                       onChange={(e) => updateField(a.id, "erpCode", e.target.value)}
                       onBlur={() => persistField(a.id, "erpCode")}
                       className={cn(
-                        "w-24 rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:border-input focus:bg-background focus:ring-1 focus:ring-ring/40",
+                        "w-24 rounded-lg border border-transparent bg-transparent px-2 text-sm outline-none hover:border-input focus:bg-background focus-visible:border-ring focus-ring",
                         inputY,
                       )}
                     />
