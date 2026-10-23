@@ -30,7 +30,7 @@ export default async function CustomAuthoritiesPage() {
   return (
     <>
       <PageHeader title="Custom Authorities" tabsBasePath="/custom-authorities" />
-      <AuthoritiesTable initialAuthorities={authorities} fetchError={error?.message ?? null} />
+      <AuthoritiesTable key={projectId} initialAuthorities={authorities} fetchError={error?.message ?? null} />
     </>
   )
 }

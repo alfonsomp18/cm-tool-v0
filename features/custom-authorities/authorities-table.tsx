@@ -102,7 +102,7 @@ export function AuthoritiesTable({
 }) {
   const supabase = useMemo(() => createClient(), [])
   const [rows, setRows] = useState<Authority[]>(initialAuthorities)
-  const [selected, setSelected] = useState<Set<string>>(new Set(initialAuthorities.map((a) => a.id)))
+  const [selected, setSelected] = useState<Set<string>>(new Set())
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState("")
   const [actionFilter, setActionFilter] = useState<string>("all")
