@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { ChevronDown, Trash2, Play, AlertTriangle, SlidersHorizontal, MoreHorizontal, Copy } from "lucide-react"
+import { Trash2, Play, AlertTriangle, SlidersHorizontal, MoreHorizontal, Copy } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { Authority } from "./authorities-data"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -82,14 +83,12 @@ function StatusBadge({ status }: { status: Authority["status"] }) {
   )
 }
 
+// Only the count is stored, so there is nothing to expand: show it as a plain badge, not a button.
 function CountPill({ value }: { value: number }) {
   return (
-    <button className="inline-flex items-center gap-1 rounded-lg border border-input bg-background px-2 py-1 text-xs hover:bg-secondary">
-      <ChevronDown className="h-3 w-3 text-muted-foreground" />
-      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-semibold text-background">
-        {value}
-      </span>
-    </button>
+    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1.5 text-[11px] font-semibold text-background">
+      {value}
+    </span>
   )
 }
 
@@ -336,12 +335,6 @@ export function AuthoritiesTable({
           <span className="text-xs text-muted-foreground">
             {selected.size} of {rows.length} selected
           </span>
-          <select
-            disabled={selected.size === 0}
-            className="rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:border-ring focus-ring disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <option>Bulk action</option>
-          </select>
           <button
             onClick={() => setPendingDelete({ type: "bulk" })}
             disabled={selected.size === 0}
@@ -509,10 +502,21 @@ export function AuthoritiesTable({
 
       {/* Footer action */}
       <div className="flex justify-end px-4 py-4 md:px-6">
-        <button className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90">
-          <Play className="h-4 w-4" />
-          Proceed to Execution
-        </button>
+        {/* There is no execution feature yet. aria-disabled (not disabled) keeps the button focusable so the tooltip works on hover and keyboard focus. */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="lg"
+              aria-disabled="true"
+              onClick={(e) => e.preventDefault()}
+              className="cursor-not-allowed opacity-50 hover:bg-primary"
+            >
+              <Play />
+              Proceed to Execution
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Execution isn&apos;t available yet. Coming soon.</TooltipContent>
+        </Tooltip>
       </div>
 
       <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && !isDeleting && setPendingDelete(null)}>
