@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Workflow, LifeBuoy, Wrench, ChevronDown, Server } from "lucide-react"
+import { Workflow, Wrench, ChevronDown } from "lucide-react"
 import { homeNav, pipelineNav, toolsNav, type NavItem } from "@/lib/nav-config"
 import { cn } from "@/lib/utils"
 
@@ -67,14 +67,13 @@ function NavRow({ item, active }: { item: NavItem; active: boolean }) {
   return <button className={className}>{content}</button>
 }
 
-type SectionKey = "pipeline" | "support" | "tools"
+type SectionKey = "pipeline" | "tools"
 
 export function AppSidebar({ className }: { className?: string }) {
   const pathname = usePathname()
   const [query, setQuery] = useState("")
   const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
     pipeline: true,
-    support: true,
     tools: true,
   })
 
@@ -97,7 +96,7 @@ export function AppSidebar({ className }: { className?: string }) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search endpoint..."
+          placeholder="Search pages..."
           className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-ring"
         />
       </div>
@@ -131,19 +130,8 @@ export function AppSidebar({ className }: { className?: string }) {
           </>
         )}
 
-        {!isSearching && (
-          <div className="mt-4">
-            <SectionHeader
-              icon={LifeBuoy}
-              label="Support & Troubleshoot"
-              open={openSections.support}
-              onToggle={() => toggleSection("support")}
-            />
-          </div>
-        )}
-
         {(!isSearching || filteredTools.length > 0) && (
-          <div className="mt-2">
+          <div className="mt-4">
             <SectionHeader
               icon={Wrench}
               label="Tools"
@@ -159,21 +147,7 @@ export function AppSidebar({ className }: { className?: string }) {
             )}
           </div>
         )}
-
-        {!isSearching && (
-          <div className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground">
-            <Server className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium text-foreground">API Endpoints</span>
-            <span className="ml-auto rounded-full bg-foreground px-2 py-0.5 text-[11px] font-semibold text-background">
-              142
-            </span>
-          </div>
-        )}
       </nav>
-
-      <div className="border-t border-border px-4 py-2 text-xs text-muted-foreground">
-        GET List Authorities · 200
-      </div>
     </aside>
   )
 }
