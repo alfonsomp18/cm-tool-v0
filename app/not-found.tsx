@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { StatusMessage } from "@/components/status-message"
+
+export const metadata: Metadata = { title: "Page not found" }
 
 export default function NotFound() {
   return (

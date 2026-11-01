@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import { PageHeader } from "@/components/page-header"
 import { HomeTile } from "@/components/home-tile"
 import { pipelineNav, toolsNav, type NavItem } from "@/lib/nav-config"
+
+export const metadata: Metadata = { title: "Home" }
 
 function byImplementedFirst(items: NavItem[]) {
   return [...items].sort((a, b) => Number(!!b.implemented) - Number(!!a.implemented))

@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import { ArrowLeftRight } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { ComingSoon } from "@/components/coming-soon"
+
+export const metadata: Metadata = { title: "REST/SOAP Mapping" }
 
 export default function RestSoapMappingPage() {
   return (
