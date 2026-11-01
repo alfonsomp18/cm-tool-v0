@@ -9,7 +9,10 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'End-to-End Certificate Manager tool',
+  title: {
+    default: 'End-to-End Certificate Manager tool',
+    template: '%s · End-to-End Certificate Manager tool',
+  },
   description: 'Configuration management and ERP automation studio',
   generator: 'v0.app',
   icons: {

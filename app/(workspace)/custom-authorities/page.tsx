@@ -1,8 +1,11 @@
+import type { Metadata } from "next"
 import { PageHeader } from "@/components/page-header"
 import { AuthoritiesTable } from "@/features/custom-authorities/authorities-table"
 import { createClient } from "@/lib/supabase/server"
 import { mapAuthorityRow, type AuthorityRow } from "@/features/custom-authorities/authorities-data"
 import { getCurrentProject } from "@/lib/current-project"
+
+export const metadata: Metadata = { title: "Custom Authorities" }
 
 export default async function CustomAuthoritiesPage() {
   const { projectId } = await getCurrentProject()
