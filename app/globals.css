@@ -149,4 +149,20 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Honor the OS "reduce motion" setting for everything at once: the skeleton pulse, menu/dialog/drawer/
+     tooltip entrances, toasts, and hover/focus transitions. Durations are near-zero rather than "none" so
+     animationend/transitionend still fire; Radix waits for them before unmounting closed menus and dialogs. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
