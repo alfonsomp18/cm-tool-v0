@@ -15,6 +15,13 @@ const steps = pipelineNav
   .filter((item) => item.step != null)
   .sort((a, b) => a.step! - b.step!)
 
+const stateText: Record<StageState, string> = {
+  done: ", completed",
+  active: ", current step",
+  todo: ", not started",
+}
+
+// Non-active steps are icon-only until xl; the label stays available to screen readers and as a hover title.
 function StageNode({
   label,
   icon: Icon,
@@ -25,21 +32,26 @@ function StageNode({
   state: StageState
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2" title={label}>
       <div
         className={cn(
-          "flex h-7 w-7 items-center justify-center rounded-full border-2",
+          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2",
           state === "done" && "border-success bg-success text-success-foreground",
           state === "active" && "border-primary bg-primary/10 text-primary",
           state === "todo" && "border-border bg-background text-muted-foreground",
         )}
       >
-        {state === "done" ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+        {state === "done" ? <Check className="h-3 w-3" /> : <Icon className="h-3 w-3" />}
       </div>
+      <span className="sr-only">
+        {label}
+        {stateText[state]}
+      </span>
       <span
+        aria-hidden="true"
         className={cn(
           "text-xs font-medium",
-          state === "active" ? "text-primary" : "text-muted-foreground hidden md:inline",
+          state === "active" ? "text-primary" : "hidden text-muted-foreground xl:inline",
         )}
       >
         {label}
@@ -77,26 +89,54 @@ export function AppHeader({
     router.refresh()
   }
 
+  const activeStep = steps[activeIndex]
+
   return (
     <header className="flex flex-col border-b border-border bg-card">
-      {/* Row 1: brand + project switcher + account */}
-      <div className="flex items-center gap-2 px-3 py-3 sm:gap-4 sm:px-4">
+      {/* One row: brand, pipeline stepper (md+), project switcher, account */}
+      <div className="flex items-center gap-2 px-3 py-2 sm:gap-4 sm:px-4">
         <MobileNavTrigger className="-ml-1" />
 
         <div className="flex min-w-0 items-center gap-2.5">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Zap className="h-4 w-4" />
           </div>
-          <span className="hidden truncate text-base font-medium tracking-tight text-foreground sm:inline">
+          <span className="hidden truncate text-base font-medium tracking-tight text-foreground xl:inline">
             End-to-End Certificate Manager tool
           </span>
         </div>
 
+        {projectSelected && (
+          <nav aria-label="Pipeline progress" className="hidden min-w-0 flex-1 justify-center md:flex">
+            <ol className="flex items-center gap-2 xl:gap-3">
+              {steps.map((step, i) => {
+                const state: StageState = i < activeIndex ? "done" : i === activeIndex ? "active" : "todo"
+                return (
+                  <li
+                    key={step.label}
+                    aria-current={state === "active" ? "step" : undefined}
+                    className="flex items-center gap-2 xl:gap-3"
+                  >
+                    <StageNode label={step.shortLabel ?? step.label} icon={step.icon} state={state} />
+                    {i < steps.length - 1 && (
+                      <div
+                        aria-hidden="true"
+                        className={cn("h-0.5 w-3 rounded-full lg:w-4 xl:w-8", state === "done" ? "bg-success" : "bg-border")}
+                      />
+                    )}
+                  </li>
+                )
+              })}
+            </ol>
+          </nav>
+        )}
+
         <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
           <select
+            aria-label="Project"
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
-            className="min-w-0 max-w-[9.5rem] rounded-lg border border-input bg-background px-2 py-1.5 text-sm font-medium outline-none focus-visible:border-ring focus-ring sm:max-w-[14rem] sm:px-3"
+            className="min-w-0 max-w-[9.5rem] rounded-lg border border-input bg-background px-2 py-1.5 text-sm font-medium outline-none focus-visible:border-ring focus-ring sm:max-w-[10rem] sm:px-3 lg:max-w-[14rem]"
           >
             {projects.length === 0 ? (
               <option value="">{projectsError ? "Couldn't load projects" : "No projects yet"}</option>
@@ -137,26 +177,13 @@ export function AppHeader({
         </div>
       </div>
 
-      {/* Row 2: Flow — only meaningful once a project is selected */}
-      <div className="flex items-center justify-center border-t border-border px-4 py-2.5">
-        {projectSelected ? (
-          <div className="flex items-center gap-2 md:gap-3">
-            {steps.map((step, i) => {
-              const state: StageState = i < activeIndex ? "done" : i === activeIndex ? "active" : "todo"
-              return (
-                <div key={step.label} className="flex items-center gap-2 md:gap-3">
-                  <StageNode label={step.shortLabel ?? step.label} icon={step.icon} state={state} />
-                  {i < steps.length - 1 && (
-                    <div className={cn("h-0.5 w-4 rounded-full md:w-8", state === "done" ? "bg-success" : "bg-border")} />
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        ) : (
-          <span className="text-xs text-muted-foreground">Select a project to see pipeline progress</span>
-        )}
-      </div>
+      {/* Phones: the stepper doesn't fit in the row, so show the current step as a slim strip */}
+      {projectSelected && (
+        <p className="border-t border-border px-3 py-1 text-xs text-muted-foreground md:hidden">
+          Step {activeIndex + 1} of {steps.length} ·{" "}
+          <span className="font-medium text-foreground">{activeStep.shortLabel ?? activeStep.label}</span>
+        </p>
+      )}
     </header>
   )
 }
