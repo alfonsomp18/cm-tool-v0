@@ -32,7 +32,7 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
           <AppHeader projects={projects} userEmail={userEmail} projectsError={projectsError} />
 
           <div className="flex flex-1 overflow-hidden">
-            <AppSidebar className="hidden md:flex" />
+            <AppSidebar className="hidden md:flex" collapsible />
             <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex min-w-0 flex-1 flex-col overflow-hidden outline-none">
               {projectsError ? <ProjectsLoadError /> : projects.length === 0 ? <NoProjectsState /> : children}
             </main>
