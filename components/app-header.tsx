@@ -92,7 +92,7 @@ export function AppHeader({
   const activeStep = steps[activeIndex]
 
   return (
-    <header className="flex flex-col border-b border-border bg-card">
+    <header className="flex flex-col border-b border-border bg-card font-header">
       {/* One row: brand, pipeline stepper (md+), project switcher, account */}
       <div className="flex items-center gap-2 px-3 py-2 sm:gap-4 sm:px-4">
         <MobileNavTrigger className="-ml-1" />
