@@ -36,9 +36,9 @@ function StageNode({
       <div
         className={cn(
           "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2",
-          state === "done" && "border-success bg-success text-success-foreground",
-          state === "active" && "border-primary bg-primary/10 text-primary",
-          state === "todo" && "border-border bg-background text-muted-foreground",
+          state === "done" && "border-header-foreground bg-header-foreground text-header",
+          state === "active" && "border-header-foreground bg-header-foreground/15 text-header-foreground",
+          state === "todo" && "border-header-foreground/60 text-header-foreground/85",
         )}
       >
         {state === "done" ? <Check className="h-3 w-3" /> : <Icon className="h-3 w-3" />}
@@ -50,8 +50,8 @@ function StageNode({
       <span
         aria-hidden="true"
         className={cn(
-          "text-xs font-medium",
-          state === "active" ? "text-primary" : "hidden text-muted-foreground xl:inline",
+          "text-xs",
+          state === "active" ? "font-semibold text-header-foreground" : "hidden font-medium text-header-foreground/85 xl:inline",
         )}
       >
         {label}
@@ -92,16 +92,17 @@ export function AppHeader({
   const activeStep = steps[activeIndex]
 
   return (
-    <header className="flex flex-col border-b border-border bg-card font-header">
+    // --ring is the brand blue, which would vanish on the blue bar, so focus rings inside the header are white.
+    <header className="flex flex-col border-b border-header-foreground/15 bg-header font-header text-header-foreground [--ring:var(--header-foreground)]">
       {/* One row: brand, pipeline stepper (md+), project switcher, account */}
       <div className="flex items-center gap-2 px-3 py-2 sm:gap-4 sm:px-4">
-        <MobileNavTrigger className="-ml-1" />
+        <MobileNavTrigger className="-ml-1 text-header-foreground/85 hover:bg-header-foreground/10 hover:text-header-foreground" />
 
         <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-header-foreground text-header">
             <Zap className="h-4 w-4" />
           </div>
-          <span className="hidden truncate text-base font-medium tracking-tight text-foreground xl:inline">
+          <span className="hidden truncate text-base font-medium tracking-tight xl:inline">
             End-to-End Certificate Manager tool
           </span>
         </div>
@@ -121,7 +122,10 @@ export function AppHeader({
                     {i < steps.length - 1 && (
                       <div
                         aria-hidden="true"
-                        className={cn("h-0.5 w-3 rounded-full lg:w-4 xl:w-8", state === "done" ? "bg-success" : "bg-border")}
+                        className={cn(
+                          "h-0.5 w-3 rounded-full lg:w-4 xl:w-8",
+                          state === "done" ? "bg-header-foreground" : "bg-header-foreground/40",
+                        )}
                       />
                     )}
                   </li>
@@ -136,7 +140,7 @@ export function AppHeader({
             aria-label="Project"
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
-            className="min-w-0 max-w-[9.5rem] rounded-lg border border-input bg-background px-2 py-1.5 text-sm font-medium outline-none focus-visible:border-ring focus-ring sm:max-w-[10rem] sm:px-3 lg:max-w-[14rem]"
+            className="min-w-0 max-w-[9.5rem] rounded-lg border border-header-foreground/60 bg-header-foreground/10 px-2 py-1.5 text-sm font-medium text-header-foreground outline-none hover:bg-header-foreground/15 focus-visible:border-ring focus-ring sm:max-w-[10rem] sm:px-3 lg:max-w-[14rem] [&_option]:bg-card [&_option]:text-card-foreground"
           >
             {projects.length === 0 ? (
               <option value="">{projectsError ? "Couldn't load projects" : "No projects yet"}</option>
@@ -152,7 +156,7 @@ export function AppHeader({
 
           {projectsError && (
             <span
-              className="flex items-center gap-1 text-xs text-destructive"
+              className="flex items-center gap-1 rounded-md bg-header-foreground px-1.5 py-0.5 text-xs font-medium text-destructive"
               title={projectsError}
             >
               <AlertTriangle className="h-3.5 w-3.5" />
@@ -160,16 +164,16 @@ export function AppHeader({
             </span>
           )}
 
-          <div className="flex shrink-0 items-center gap-1 border-l border-border pl-2 sm:gap-2 sm:pl-3">
-            <span className="hidden max-w-[10rem] truncate text-xs text-muted-foreground lg:inline" title={userEmail}>
+          <div className="flex shrink-0 items-center gap-1 border-l border-header-foreground/30 pl-2 sm:gap-2 sm:pl-3">
+            <span className="hidden max-w-[10rem] truncate text-xs text-header-foreground/85 lg:inline" title={userEmail}>
               {userEmail}
             </span>
-            <ThemeToggle />
+            <ThemeToggle className="text-header-foreground/85 hover:bg-header-foreground/10 hover:text-header-foreground active:bg-header-foreground/15" />
             <button
               onClick={handleSignOut}
               aria-label="Sign out"
               title="Sign out"
-              className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
+              className="rounded-lg p-1.5 text-header-foreground/85 hover:bg-header-foreground/10 hover:text-header-foreground active:bg-header-foreground/15"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -179,9 +183,9 @@ export function AppHeader({
 
       {/* Phones: the stepper doesn't fit in the row, so show the current step as a slim strip */}
       {projectSelected && (
-        <p className="border-t border-border px-3 py-1 text-xs text-muted-foreground md:hidden">
+        <p className="border-t border-header-foreground/15 px-3 py-1 text-xs text-header-foreground/85 md:hidden">
           Step {activeIndex + 1} of {steps.length} ·{" "}
-          <span className="font-medium text-foreground">{activeStep.shortLabel ?? activeStep.label}</span>
+          <span className="font-medium text-header-foreground">{activeStep.shortLabel ?? activeStep.label}</span>
         </p>
       )}
     </header>
