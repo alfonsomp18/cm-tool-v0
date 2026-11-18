@@ -36,6 +36,10 @@
   --border: oklch(0.928 0.006 264.531);
   --input: oklch(0.928 0.006 264.531);
   --ring: oklch(0.56 0.19 259.815);
+  /* Top bar: solid brand blue with white text. Not --primary, which is too light for white text in dark mode
+     (3.76:1). Measured against white: text 6.21:1, text at 85% 4.94:1, borders/icons at 60% 3.24:1. */
+  --header: oklch(0.5 0.19 259.815);
+  --header-foreground: oklch(1 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -76,6 +80,9 @@
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.623 0.214 259.815);
+  /* Deeper blue than light mode so white text stays readable: text 7.67:1, 85% 6.00:1, 60% 3.80:1. */
+  --header: oklch(0.45 0.17 259.815);
+  --header-foreground: oklch(1 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -118,6 +125,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-header: var(--header);
+  --color-header-foreground: var(--header-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
