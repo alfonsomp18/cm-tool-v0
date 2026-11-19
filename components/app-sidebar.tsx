@@ -188,6 +188,7 @@ export function AppSidebar({ className, collapsible = false }: { className?: str
 
   return (
     <aside
+      aria-label="Sidebar"
       className={cn(
         "flex shrink-0 flex-col border-r border-border bg-card transition-[width] duration-200",
         collapsed ? "w-14" : "w-72",
@@ -210,7 +211,7 @@ export function AppSidebar({ className, collapsible = false }: { className?: str
             </button>
           </CollapsedTooltip>
         ) : (
-          <div className="relative">
+          <div role="search" aria-label="Pages" className="relative">
             <Search
               aria-hidden="true"
               className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"

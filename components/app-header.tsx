@@ -1,8 +1,10 @@
 "use client"
 
+import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { AlertTriangle, Zap, Check, LogOut } from "lucide-react"
 import { pipelineNav } from "@/lib/nav-config"
+import { navCurrent } from "@/lib/nav-active"
 import { useProject } from "@/lib/project-context"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { MobileNavTrigger } from "@/components/mobile-nav"
@@ -98,14 +100,20 @@ export function AppHeader({
       <div className="flex items-center gap-2 px-3 py-2 sm:gap-4 sm:px-4">
         <MobileNavTrigger className="-ml-1 text-header-foreground/85 hover:bg-header-foreground/10 hover:text-header-foreground" />
 
-        <div className="flex min-w-0 items-center gap-2.5">
+        {/* The brand is the "home" link. The name stays on the link because the title text is hidden below xl. */}
+        <Link
+          href="/"
+          aria-label="End-to-End Certificate Manager tool, home"
+          aria-current={navCurrent("/", pathname) === "page" ? "page" : undefined}
+          className="-m-1 flex min-w-0 items-center gap-2.5 rounded-lg p-1 hover:bg-header-foreground/10 focus-ring"
+        >
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-header-foreground text-header">
             <Zap className="h-4 w-4" />
           </div>
           <span className="hidden truncate text-base font-medium tracking-tight xl:inline">
             End-to-End Certificate Manager tool
           </span>
-        </div>
+        </Link>
 
         {projectSelected && (
           <nav aria-label="Pipeline progress" className="hidden min-w-0 flex-1 justify-center md:flex">
@@ -140,7 +148,7 @@ export function AppHeader({
             aria-label="Project"
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
-            className="min-w-0 max-w-[9.5rem] rounded-lg border border-header-foreground/60 bg-header-foreground/10 px-2 py-1.5 text-sm font-medium text-header-foreground outline-none hover:bg-header-foreground/15 focus-visible:border-ring focus-ring sm:max-w-[10rem] sm:px-3 lg:max-w-[14rem] [&_option]:bg-card [&_option]:text-card-foreground"
+            className="min-h-8 min-w-0 max-w-[9.5rem] rounded-lg border border-header-foreground/60 bg-header-foreground/10 px-2 py-1.5 text-sm font-medium text-header-foreground outline-none hover:bg-header-foreground/15 focus-visible:border-ring focus-ring sm:max-w-[10rem] sm:px-3 lg:max-w-[14rem] [&_option]:bg-card [&_option]:text-card-foreground"
           >
             {projects.length === 0 ? (
               <option value="">{projectsError ? "Couldn't load projects" : "No projects yet"}</option>
@@ -170,10 +178,11 @@ export function AppHeader({
             </span>
             <ThemeToggle className="text-header-foreground/85 hover:bg-header-foreground/10 hover:text-header-foreground active:bg-header-foreground/15" />
             <button
+              type="button"
               onClick={handleSignOut}
               aria-label="Sign out"
               title="Sign out"
-              className="rounded-lg p-1.5 text-header-foreground/85 hover:bg-header-foreground/10 hover:text-header-foreground active:bg-header-foreground/15"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-header-foreground/85 hover:bg-header-foreground/10 hover:text-header-foreground active:bg-header-foreground/15"
             >
               <LogOut className="h-4 w-4" />
             </button>
