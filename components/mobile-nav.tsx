@@ -48,6 +48,7 @@ export function MobileNavTrigger({ className }: { className?: string }) {
       type="button"
       onClick={() => setOpen(true)}
       aria-label="Open navigation"
+      aria-haspopup="dialog"
       aria-expanded={open}
       className={cn("rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground md:hidden", className)}
     >
