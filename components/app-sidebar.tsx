@@ -3,9 +3,10 @@
 import { useEffect, useId, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Workflow, Wrench, ChevronDown, Search, X, PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { Workflow, Wrench, ChevronDown, Check, Search, X, PanelLeftClose, PanelLeftOpen } from "lucide-react"
 import { homeNav, pipelineNav, toolsNav, type NavItem } from "@/lib/nav-config"
 import { navCurrent } from "@/lib/nav-active"
+import { stepStates, type StepState } from "@/lib/pipeline-progress"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
@@ -47,11 +48,11 @@ function SectionHeader({
       onClick={onToggle}
       aria-expanded={open}
       aria-controls={controls}
-      className={cn(rowBase, "justify-between gap-0 py-2", rowIdle, "text-foreground hover:text-foreground")}
+      className={cn(rowBase, "justify-between gap-0 py-1.5 md:min-h-8", rowIdle)}
     >
       <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm font-semibold">{label}</span>
+        <Icon className="h-4 w-4" />
+        <span className="text-xs font-semibold uppercase tracking-wider">{label}</span>
       </div>
       <ChevronDown
         className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", !open && "-rotate-90")}
@@ -60,21 +61,68 @@ function SectionHeader({
   )
 }
 
-function NavRow({ item, pathname, collapsed }: { item: NavItem; pathname: string; collapsed: boolean }) {
+// Step badge colors. Measured label contrast on each fill: 4.58:1 (current, light) up to 7.81:1; see the spec.
+const badgeStyle: Record<StepState, string> = {
+  done: "bg-success text-success-foreground",
+  active: "bg-primary text-primary-foreground",
+  todo: "border border-border text-muted-foreground",
+}
+const stateText: Record<StepState, string> = {
+  done: ", completed",
+  active: ", current step",
+  todo: ", not started",
+}
+
+function NavRow({
+  item,
+  pathname,
+  collapsed,
+  progress,
+}: {
+  item: NavItem
+  pathname: string
+  collapsed: boolean
+  progress?: Map<number, StepState> | null
+}) {
   const Icon = item.icon
   const current = navCurrent(item.href, pathname)
   const active = current !== undefined
   const layout = collapsed ? "justify-center px-0" : ""
+  // Neutral ("todo" look) when the current page isn't one of the numbered steps.
+  const step = item.step ? (progress?.get(item.step) ?? "todo") : undefined
+  const stepName = progress && step ? stateText[step] : ""
 
   const content = (
     <>
       {!collapsed && item.step ? (
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground text-[11px] font-semibold text-background">
-          {item.step}
+        <span
+          aria-hidden="true"
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
+            badgeStyle[step ?? "todo"],
+          )}
+        >
+          {step === "done" ? <Check className="h-3 w-3" strokeWidth={3} /> : item.step}
         </span>
       ) : null}
       <Icon className={cn("h-4 w-4 shrink-0", active && "text-primary")} />
-      {!collapsed && <span className="truncate text-left">{item.label}</span>}
+      {!collapsed && (
+        <span className="truncate text-left">
+          {item.step ? <span className="sr-only">Step {item.step}: </span> : null}
+          {item.label}
+          {stepName ? <span className="sr-only">{stepName}</span> : null}
+        </span>
+      )}
+      {/* The icon-only rail has no badge, so progress shows as a small dot on the icon. */}
+      {collapsed && progress && (step === "done" || step === "active") ? (
+        <span
+          aria-hidden="true"
+          className={cn(
+            "absolute right-1.5 top-1.5 h-2 w-2 rounded-full ring-2 ring-card",
+            step === "done" ? "bg-success" : "bg-primary",
+          )}
+        />
+      ) : null}
     </>
   )
 
@@ -89,7 +137,7 @@ function NavRow({ item, pathname, collapsed }: { item: NavItem; pathname: string
   }
 
   // Icon-only links need a name; keep the step number the sighted label shows.
-  const collapsedName = item.step ? `Step ${item.step}: ${item.label}` : item.label
+  const collapsedName = `${item.step ? `Step ${item.step}: ` : ""}${item.label}${stepName}`
 
   return (
     <CollapsedTooltip label={collapsedName} enabled={collapsed}>
@@ -103,7 +151,7 @@ function NavRow({ item, pathname, collapsed }: { item: NavItem; pathname: string
           layout,
           "relative",
           active
-            ? "bg-primary/10 font-medium text-primary before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full before:bg-primary"
+            ? "bg-primary/10 font-semibold text-foreground before:absolute before:inset-y-1.5 before:left-0 before:w-1 before:rounded-full before:bg-primary"
             : rowIdle,
         )}
       >
@@ -118,6 +166,7 @@ type SectionKey = "pipeline" | "tools"
 export function AppSidebar({ className, collapsible = false }: { className?: string; collapsible?: boolean }) {
   const pathname = usePathname()
   const router = useRouter()
+  const progress = stepStates(pathname)
   const sectionId = useId()
   const searchRef = useRef<HTMLInputElement>(null)
   const focusSearchOnExpand = useRef(false)
@@ -246,13 +295,13 @@ export function AppSidebar({ className, collapsible = false }: { className?: str
         </p>
       </div>
 
-      <nav aria-label="Primary" className="flex-1 overflow-y-auto px-2 py-3">
+      <nav aria-label="Primary" className={cn("flex-1 overflow-y-auto py-4", collapsed ? "px-2" : "px-3")}>
         {noResults && (
           <p className="px-3 py-2 text-sm text-muted-foreground">No matches for &quot;{query.trim()}&quot;</p>
         )}
 
         {homeVisible && (
-          <div className="mb-2">
+          <div className="mb-4">
             <NavRow item={homeNav} pathname={pathname} collapsed={collapsed} />
           </div>
         )}
@@ -271,9 +320,9 @@ export function AppSidebar({ className, collapsible = false }: { className?: str
               />
             )}
             {pipelineOpen && (
-              <div id={`${sectionId}-pipeline`} className="flex flex-col gap-0.5">
+              <div id={`${sectionId}-pipeline`} className="flex flex-col gap-1">
                 {filteredPipeline.map((item) => (
-                  <NavRow key={item.label} item={item} pathname={pathname} collapsed={collapsed} />
+                  <NavRow key={item.label} item={item} pathname={pathname} collapsed={collapsed} progress={progress} />
                 ))}
               </div>
             )}
@@ -281,7 +330,7 @@ export function AppSidebar({ className, collapsible = false }: { className?: str
         )}
 
         {(!isSearching || filteredTools.length > 0) && (
-          <div className={collapsed ? undefined : "mt-4"}>
+          <div className={collapsed ? undefined : "mt-6"}>
             {collapsed ? (
               <div role="separator" className="mx-1 my-2 border-t border-border" />
             ) : (
@@ -294,7 +343,7 @@ export function AppSidebar({ className, collapsible = false }: { className?: str
               />
             )}
             {toolsOpen && (
-              <div id={`${sectionId}-tools`} className="flex flex-col gap-0.5">
+              <div id={`${sectionId}-tools`} className="flex flex-col gap-1">
                 {filteredTools.map((item) => (
                   <NavRow key={item.label} item={item} pathname={pathname} collapsed={collapsed} />
                 ))}
