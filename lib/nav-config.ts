@@ -18,12 +18,10 @@ import {
 
 export interface NavItem {
   label: string
-  /** Condensed label for the header's stage tracker; falls back to `label`. */
-  shortLabel?: string
   /** Omit while the page doesn't exist yet — renders as a non-navigating label. */
   href?: string
   icon: LucideIcon
-  /** Presence marks this item as part of the header's numbered stage tracker. */
+  /** Presence marks this item as one of the numbered pipeline steps (badges and progress in the sidebar). */
   step?: number
   /** One-line blurb shown on the home screen's tile. Only set for built pages. */
   description?: string
@@ -36,14 +34,12 @@ export const homeNav: NavItem = { label: "Home", href: "/", icon: Home }
 export const pipelineNav: NavItem[] = [
   {
     label: "Configuration Projects",
-    shortLabel: "Config",
     href: "/configuration-projects",
     icon: ListChecks,
     step: 1,
   },
   {
     label: "Data Ingestion",
-    shortLabel: "Ingestion",
     href: "/data-ingestion",
     icon: Database,
     step: 2,
@@ -51,7 +47,6 @@ export const pipelineNav: NavItem[] = [
   },
   {
     label: "Automated Configurations",
-    shortLabel: "Automation",
     href: "/automated-configurations",
     icon: Settings2,
     step: 3,
@@ -66,7 +61,6 @@ export const pipelineNav: NavItem[] = [
   },
   {
     label: "Automated Testing",
-    shortLabel: "Testing",
     href: "/automated-testing",
     icon: FlaskConical,
     step: 4,
