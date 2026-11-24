@@ -23,8 +23,13 @@ export interface NavItem {
   icon: LucideIcon
   /** Presence marks this item as one of the numbered pipeline steps (badges and progress in the sidebar). */
   step?: number
-  /** One-line blurb shown on the home screen's tile. Only set for built pages. */
+  /** One-line blurb of what the module is for: shown on the home screen's tile and on its coming-soon page. */
   description?: string
+  /**
+   * Sections beyond Overview that are actually built. The tab strip only shows these, so an unbuilt
+   * Settings or Activity page isn't offered. Add "settings" or "activity" here when its page gets real content.
+   */
+  tabs?: ("settings" | "activity")[]
   /** True only once the page has real functionality, not just a placeholder. */
   implemented?: boolean
 }
@@ -37,6 +42,7 @@ export const pipelineNav: NavItem[] = [
     href: "/configuration-projects",
     icon: ListChecks,
     step: 1,
+    description: "Create and manage the projects your configurations are built in.",
   },
   {
     label: "Data Ingestion",
@@ -50,8 +56,14 @@ export const pipelineNav: NavItem[] = [
     href: "/automated-configurations",
     icon: Settings2,
     step: 3,
+    description: "Generate configurations from the data you ingested.",
   },
-  { label: "Automated ERP Code Mapping", href: "/erp-code-mapping", icon: Code2 },
+  {
+    label: "Automated ERP Code Mapping",
+    href: "/erp-code-mapping",
+    icon: Code2,
+    description: "Map generated configurations to your ERP's codes.",
+  },
   {
     label: "Custom Authorities",
     href: "/custom-authorities",
@@ -64,15 +76,21 @@ export const pipelineNav: NavItem[] = [
     href: "/automated-testing",
     icon: FlaskConical,
     step: 4,
+    description: "Run automated tests against a finished configuration.",
   },
 ]
 
 export const toolsNav: NavItem[] = [
-  { label: "API Connection", href: "/api-connection", icon: Plug },
-  { label: "OpenArena AI", href: "/openarena-ai", icon: Sparkles },
-  { label: "REST/SOAP Mapping", href: "/rest-soap-mapping", icon: ArrowLeftRight },
-  { label: "Snowflake", href: "/snowflake", icon: Snowflake },
-  { label: "Request History", href: "/request-history", icon: History },
-  { label: "Documentation", href: "/documentation", icon: FileText },
-  { label: "Welcome / Tour", href: "/welcome-tour", icon: Compass },
+  { label: "API Connection", href: "/api-connection", icon: Plug, description: "Set up the connection to your ERP's API." },
+  { label: "OpenArena AI", href: "/openarena-ai", icon: Sparkles, description: "AI help with the configuration workflow." },
+  {
+    label: "REST/SOAP Mapping",
+    href: "/rest-soap-mapping",
+    icon: ArrowLeftRight,
+    description: "Map REST and SOAP request fields to the tool's data.",
+  },
+  { label: "Snowflake", href: "/snowflake", icon: Snowflake, description: "Connect to your data in Snowflake." },
+  { label: "Request History", href: "/request-history", icon: History, description: "Review past API requests and their responses." },
+  { label: "Documentation", href: "/documentation", icon: FileText, description: "Guides and reference for using the tool." },
+  { label: "Welcome / Tour", href: "/welcome-tour", icon: Compass, description: "A guided introduction to the tool." },
 ]
