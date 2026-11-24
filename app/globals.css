@@ -13,6 +13,8 @@
 }
 
 :root {
+  /* Lets the browser draw native controls (select popups, scrollbars, date pickers) to match the theme. */
+  color-scheme: light;
   --background: oklch(0.985 0.002 247.839);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -56,46 +58,59 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* Dark theme. Neutrals are tinted toward the brand hue (260) instead of pure grey, and each surface step is
+   visibly lighter than the one beneath it. Contrast measured from these values (WCAG, oklch -> sRGB):
+   - surfaces: card/background 1.14, popover/card 1.13, secondary/card 1.27
+   - --border vs background/card/popover: 1.67 / 1.47 / 1.30 (target 1.3)
+   - --input (field outline) vs background/card/popover: 4.23 / 3.72 / 3.29 (WCAG 1.4.11 needs 3)
+   - --muted-foreground vs background/card/popover/secondary: 9.17 / 8.07 / 7.13 / 6.35 (target 4.5)
+   - status colors as text, worst case on their own 15% tint over card: primary 4.72, destructive 5.01,
+     success 5.90, warning 6.51; each also clears 4.5 on background, card and secondary
+   - dark label on the destructive / success / warning fills: 6.84 / 8.53 / 9.55; on primary 6.77
+   - --chart-1..5 vs card: 6.11 / 8.78 / 10.04 / 6.14 / 6.39 (target 3) */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.623 0.214 259.815);
-  --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --warning: oklch(0.75 0.183 55.934);
-  --warning-foreground: oklch(0.145 0 0);
-  --success: oklch(0.696 0.17 149.213);
-  --success-foreground: oklch(0.145 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.623 0.214 259.815);
+  color-scheme: dark;
+  --background: oklch(0.15 0.012 260);
+  --foreground: oklch(0.985 0.003 260);
+  --card: oklch(0.22 0.014 260);
+  --card-foreground: oklch(0.985 0.003 260);
+  --popover: oklch(0.265 0.015 260);
+  --popover-foreground: oklch(0.985 0.003 260);
+  --primary: oklch(0.68 0.17 259.815);
+  --primary-foreground: oklch(0.145 0.01 260);
+  --secondary: oklch(0.3 0.016 260);
+  --secondary-foreground: oklch(0.985 0.003 260);
+  --muted: oklch(0.3 0.016 260);
+  --muted-foreground: oklch(0.76 0.02 260);
+  --accent: oklch(0.3 0.016 260);
+  --accent-foreground: oklch(0.985 0.003 260);
+  --warning: oklch(0.78 0.16 65);
+  --warning-foreground: oklch(0.145 0.01 260);
+  --success: oklch(0.72 0.17 149.213);
+  --success-foreground: oklch(0.145 0.01 260);
+  /* Lighter than in light mode so it reads as text on dark surfaces; the label on it is dark, not white. */
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.145 0.01 260);
+  --border: oklch(0.34 0.02 260);
+  /* Form-field outline. Lighter than --border on purpose: fields need 3:1, dividers don't. */
+  --input: oklch(0.56 0.02 260);
+  --ring: oklch(0.68 0.17 259.815);
   /* Deeper blue than light mode so white text stays readable: text 7.67:1, 85% 6.00:1, 60% 3.80:1. */
   --header: oklch(0.45 0.17 259.815);
   --header-foreground: oklch(1 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.68 0.17 255);
+  --chart-2: oklch(0.76 0.14 175);
+  --chart-3: oklch(0.82 0.16 85);
+  --chart-4: oklch(0.7 0.19 305);
+  --chart-5: oklch(0.72 0.19 10);
+  --sidebar: oklch(0.22 0.014 260);
+  --sidebar-foreground: oklch(0.985 0.003 260);
+  --sidebar-primary: oklch(0.68 0.17 259.815);
+  --sidebar-primary-foreground: oklch(0.145 0.01 260);
+  --sidebar-accent: oklch(0.3 0.016 260);
+  --sidebar-accent-foreground: oklch(0.985 0.003 260);
+  --sidebar-border: oklch(0.34 0.02 260);
+  --sidebar-ring: oklch(0.68 0.17 259.815);
 }
 
 @theme inline {
