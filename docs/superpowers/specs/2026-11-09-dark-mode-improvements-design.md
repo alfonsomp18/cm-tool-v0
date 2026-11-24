@@ -62,3 +62,16 @@ Out of scope: a multi-level elevation/surface token system, new colors for the l
 - Token changes affect every screen at once, so the signed-in workspace review matters most.
 - `package-lock.json` and `app/auth/confirm/qa-saved/` are untracked leftovers from other work and are not part of this change.
 - The unfinished table work (`dirtyIds` migration) is stashed from `feat/saved-cue-for-cell-edits` and is not touched here.
+
+## Implementation notes (2026-11-23)
+
+Built on `feat/dark-mode-implementation`. Where it differs from the design above:
+
+- **Favicon: dropped.** The spec assumed `prefers-color-scheme` icons in `app/layout.tsx`. PR #48 had already replaced them with a single blue tile (`app/icon.svg`) that reads on both light and dark tab bars, so there was nothing to change.
+- **Destructive:** one token, not two. A single dark value can't be both readable as text on dark surfaces (needs to be light) and carry a white label (needs to be dark), so in dark mode `--destructive` is a light red and `--destructive-foreground` is dark. The button and badge now use `text-destructive-foreground` instead of hard-coded `text-white`, and the `dark:bg-destructive/60` override is gone. Light mode is visually unchanged.
+- **Form fields:** the fill is `--background` (darker than the card) instead of `--input/30`, and `--input` is now only the outline, lighter than `--border`. Applied to input, textarea, select, checkbox, radio, input-group, input-otp, the outline button and the active tab.
+- **Added `color-scheme`** (`light` on `:root`, `dark` on `.dark`) so native select popups, scrollbars and date pickers match the theme.
+- **Theme control:** `ThemeToggle` is now a System / Light / Dark radio menu. Its label states the choice ("Theme: System"); before mount it is a neutral "Theme" button, so there is no hydration mismatch.
+- Measured contrast for the final tokens is in the comment above `.dark` in `globals.css`.
+
+Verified in the browser on a temporary page (removed): form controls on card and page backgrounds, buttons, badges, status pills, tabs, alert, table, error toast, keyboard use of the theme menu, Light mode unchanged, and the real `/login` page in dark. The signed-in workspace was not visually checked (it sits behind login).
